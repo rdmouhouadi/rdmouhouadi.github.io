@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When honest AI agents fail together | Richie Mouhouadi</title>
+<meta name="description" content="An agent-based model in NetLogo showing how individually aligned AI agents drift, then collapse, when they share a scarce resource budget.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+.body{min-width:0}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+.dl{display:inline-flex;align-items:center;gap:10px;margin:0 0 56px;padding:12px 20px;border:1px solid var(--ink);border-radius:999px;font-size:16px;font-weight:500;text-decoration:none}
+@media (hover:hover){.dl:hover{background:var(--ink);color:var(--paper)}}
+</style>
+</head>
+<body>
+<!-- REVIEW before publishing: check that nothing confidential remains. -->
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="../#work">&larr; Back to work</a>
+</header>
+
+<main>
+  <h1>When honest AI agents fail together</h1>
+  <p class="meta">DSTI &middot; MSc Data Science &amp; AI &middot; Agent-Based Modelling &middot; 2026</p>
+  <p class="lede">I built an agent-based model of an AI orchestrator and its worker agents sharing a limited resource budget, where no agent is allowed to lie or hoard. As the budget shrinks, the system drifts quietly, then collapses with little warning, and the shape of the team decides how badly.</p>
+  <dl class="brief">
+    <div><dt>Model</dt><dd>NetLogo, 1 orchestrator, up to 100 workers</dd></div>
+    <div><dt>Experiments</dt><dd>5 experiments, 4,080 runs</dd></div>
+    <div><dt>Measures</dt><dd>5 misalignment metrics</dd></div>
+    <div><dt>Outcome</dt><dd>Slow drift, then sudden collapse</dd></div>
+  </dl>
+  <nav class="toc" aria-label="On this page"><a href="#context">Context</a><a href="#problem">Problem</a><a href="#method">Methodology</a><a href="#results">Results</a><a href="#takeaway">Takeaway</a><a href="#refs">References</a></nav>
+  <a class="dl" href="mesa-simulator.html">Try the simulator &rarr;</a>
+  <a class="dl" href="files/MESA_paper.pdf" download>Download the full paper (PDF, 11 pages) &darr;</a>
+
+  <section id="context">
+    <h2>Context</h2>
+    <div class="body"><p>AI agents increasingly work in teams. In orchestration platforms such as Mistral Workflows [1], a coordinating agent splits a goal into subtasks, hands them to worker agents and assembles the results. These teams run on shared, finite resources: context windows, token budgets, rate limits, memory. The more agents compete for them, the less each one gets.</p>
+<p>The project started as the final assignment of the Agent-Based Modelling course, which asked for an ODD protocol [2] describing a model. I then implemented the model, ran the experiments and wrote a full paper as a personal extension.</p></div>
+  </section>
+
+  <section id="problem">
+    <h2>Problem</h2>
+    <div class="body"><p>Alignment research mostly tests one model at a time, for example whether a single agent acts against its operator [3]. Complex systems, however, can behave very differently from their parts, and often shift abruptly from one regime to another instead of degrading smoothly [4].</p>
+<p><b>Research question:</b> under what conditions does a population of individually aligned AI agents produce collectively misaligned behaviour at the system level?</p></div>
+  </section>
+
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="body"><h3>Model</h3><p>MESA (Multi-Agent Emergent Systems Arena) has one orchestrator, N worker agents and an optional monitor. Each tick, the orchestrator shares out a resource pool, weighted by how much it trusts each worker. Workers progress on their subtask and report their progress. Under pressure, their reports get noisier and their logging less reliable, and an undelivered report leaves the orchestrator with a stale view. A worker whose resources fall below a survival threshold dies, and the survivors inherit its work.</p><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 200" role="img" aria-label="Feedback loop: a scarce budget raises pressure on workers, which makes reports noisy and logs incomplete, so the orchestrator's view drifts and workers die; survivors inherit the work, which raises pressure again.">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="b" x="2" y="30" width="126" height="74" rx="6"/><text x="65" y="62" text-anchor="middle">Scarce budget</text><text x="65" y="80" text-anchor="middle" class="m">scarcity slider</text>
+<path class="a" d="M128 67H146" marker-end="url(#ah)"/>
+<rect class="g" x="148" y="30" width="126" height="74" rx="6"/><text x="211" y="62" text-anchor="middle">Pressure</text><text x="211" y="80" text-anchor="middle" class="m">on each worker</text>
+<path class="a" d="M274 67H292" marker-end="url(#ah)"/>
+<rect class="g" x="294" y="30" width="126" height="74" rx="6"/><text x="357" y="62" text-anchor="middle">Noisy reports</text><text x="357" y="80" text-anchor="middle" class="m">skipped logs</text>
+<path class="a" d="M420 67H438" marker-end="url(#ah)"/>
+<rect class="g" x="440" y="30" width="126" height="74" rx="6"/><text x="503" y="62" text-anchor="middle">View drifts</text><text x="503" y="80" text-anchor="middle" class="m">trust misallocated</text>
+<path class="a" d="M566 67H584" marker-end="url(#ah)"/>
+<rect class="b" x="586" y="30" width="130" height="74" rx="6"/><text x="651" y="62" text-anchor="middle">Workers die</text><text x="651" y="80" text-anchor="middle" class="m">below threshold</text>
+<path class="a dash" d="M651 104V170H211V107" marker-end="url(#ah)"/><text x="431" y="162" text-anchor="middle" class="m">survivors inherit the orphaned work, so pressure rises again</text>
+</svg></div><figcaption><b>Figure 1.</b> The feedback loop. No rule allows deception or hoarding; misalignment can only come from these interactions.</figcaption></figure><p>Five metrics measure the system’s health: the gap between true and reported progress (information asymmetry), resource inequality, the orchestrator’s error about overall progress (task completion drift), the share of skipped logging (oversight erosion), and the share of workers that died. A weighted composite flags WARNING at 0.28 and CRITICAL at 0.45.</p>
+<h3>Topologies</h3><p>Three team structures change how a report reaches the orchestrator (Table 1).</p><div class="tbl"><table><caption><b>Table 1.</b> Reporting topologies.</caption><thead><tr><th>Topology</th><th>How a report travels</th><th>Real-world analogue</th></tr></thead><tbody><tr><td>Star</td><td>Each worker reports directly, in one hop</td><td>Small team, everyone talks to the manager</td></tr><tr><td>Ring</td><td>Direct, and a failed report can be relayed by a neighbour</td><td>Colleagues who pass on a message</td></tr><tr><td>Hierarchical</td><td>Outer workers report through a broker, in two hops; if the broker dies, its dependents may die too</td><td>A company with middle managers</td></tr></tbody></table></div>
+<h3>Experiments</h3><p>I ran five BehaviorSpace experiments, 4,080 runs in total, with up to 30 repetitions per setting: a sweep of scarcity across the three topologies, a sensitivity test on the survival threshold, population sizes from 10 to 100, an ablation that switches off the model’s only biased reporting rule, and tick-by-tick trajectories. Before the long runs, the model’s output was checked against an independent Python re-implementation.</p>
+<h3>Implementation</h3><p>NetLogo 7.0.4 with BehaviorSpace, analysis in Excel (Power Query) and Python, statistical tests with SciPy.</p></div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <div class="body"><h3>A quiet drift, then a cliff</h3><p>Up to a scarcity of 0.90, every metric rises slowly and stays far below the WARNING line. No worker dies. Between 0.90 and 0.95 the system tips: workers die one after another and many runs end with no worker alive.</p><figure class="fig"><div class="frame"><img src="images/mesa-collapse.png" width="1000" height="409" loading="lazy" alt="Two line charts against scarcity: the composite score rises slowly then jumps at 0.95, and the collapse rate stays at zero until 0.95, where it reaches 83 percent for the hierarchical topology."></div><figcaption><b>Figure 2.</b> (a) Composite misalignment score, mean ± SD over 30 runs. (b) Share of runs ending with no worker alive.</figcaption></figure><h3>Structure matters only at the edge</h3><p>Below the edge the three topologies behave almost identically. At scarcity 0.95, the hierarchy collapses in 83% of runs, against 43% for the star and 27% for the ring (p &lt; 0.001), and it fails faster. One dead broker takes its dependents with it, while the ring’s relay gives every report a second chance.</p><h3>Dishonesty is not needed</h3><p>With the under-reporting rule switched off, the information gap is the same up to a scarcity of 0.70. The rule only adds to it at the highest pressures, about a third of the gap at 0.90. Most of the damage comes from ordinary overload: noisy reports, lost messages, stale beliefs.</p><figure class="fig"><div class="frame"><img src="images/mesa-ablation.png" width="924" height="572" loading="lazy" alt="Line chart of the information asymmetry index against scarcity with the strategic-bias rule off and on; the two lines overlap up to 0.7 and separate above 0.8."></div><figcaption><b>Figure 3.</b> Information asymmetry with the biased reporting rule off and on, mean ± SD over 30 runs.</figcaption></figure><h3>The watchdog rarely barks</h3><p>The monitor’s score tracks the true information gap closely (r = 0.92), but its alarm fired in only 3 of 1,530 runs below scarcity 0.95. Monitoring shares the same budget, so it checks fewer workers exactly when it matters most.</p><h3>What did not work as expected</h3><p>The ODD predicted five patterns. Three were supported. The expected step in the information gap at moderate scarcity did not appear, and resources never concentrated in a few trusted workers (Gini below 0.02), because identical workers under the same pressure stay equally trusted. The location of the tipping point is also set by the survival threshold, so it is a sensitivity result, not a universal number.</p></div>
+  </section>
+
+  <section id="takeaway">
+    <h2>Takeaway</h2>
+    <div class="body"><p>A team of well-behaved agents can drift and then fail suddenly when resources run short, without any of them being designed to cheat, and the people overseeing them get little warning. For anyone running several AI agents on one machine, this suggests keeping headroom, checking actual outputs rather than the agents’ own reports, keeping team structures flat, and giving monitoring its own reserved resources.</p>
+<h3>Limitations</h3><ul><li>Workers follow simple fixed rules, unlike real language-model agents.</li><li>The collapse point depends on the survival threshold and the allocation formula.</li><li>All workers are identical.</li><li>Final-tick snapshots are affected by workers finishing their subtasks at the same moment.</li></ul>
+<h3>Future improvements</h3><ul><li>Reproduce the experiment with real agents on a 4 GB laptop, either with small local models through Ollama or with Mistral Workflows, each against a single-agent baseline.</li><li>Test whether durable, platform-level logging prevents the oversight erosion the model predicts.</li><li>Add heterogeneous workers and time-averaged metrics.</li></ul>
+<p>You can run the model yourself in the <a href="mesa-simulator.html">browser simulator</a>. The full paper covers the model in ODD form, the statistics behind each result and the validation protocol. <a href="files/MESA_paper.pdf" download>Download it here</a>.</p></div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <div class="body"><ol class="refs">
+<li>Mistral AI, 2026. <i>Mistral Workflows: Durable Agent Orchestration</i>. Public preview. docs.mistral.ai/workflows.</li>
+<li>Grimm, V. et al., 2020. The ODD protocol for describing agent-based and other simulation models: a second update to improve clarity, replication, and structural realism. <i>Journal of Artificial Societies and Social Simulation</i>, 23(2), 7.</li>
+<li>Lynch, A. et al., 2025. <i>Agentic Misalignment: How LLMs Could Be Insider Threats</i>. Anthropic Research.</li>
+<li>Scheffer, M. et al., 2009. Early-warning signals for critical transitions. <i>Nature</i>, 461, 53&ndash;59.</li>
+<li>Wilensky, U., 1999. <i>NetLogo</i>. Center for Connected Learning and Computer-Based Modeling, Northwestern University.</li></ol></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a href="../#work">&larr; Back to work</a>
+  <p>Course project for Agent-Based Modelling (Georgiy Bobashev, DSTI), extended as a personal study. Model files and data are available on request.</p>
+</footer>
+</div>
+</body>
+</html>

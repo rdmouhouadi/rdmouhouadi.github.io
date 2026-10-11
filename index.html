@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Richie Mouhouadi | Data Scientist and ML Engineer</title>
+<meta name="description" content="Former reservoir engineer turned data scientist and ML engineer, focused on putting models to work in production.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ebeee8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1513" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://rdmouhouadi.github.io/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Richie Mouhouadi","url":"https://rdmouhouadi.github.io/","jobTitle":"Data Scientist and ML Engineer","description":"Former reservoir engineer turned data scientist and ML engineer, focused on putting models to work in production.","address":{"@type":"PostalAddress","addressLocality":"Paris","addressCountry":"FR"},"alumniOf":[{"@type":"CollegeOrUniversity","name":"DSTI School of Engineering"},{"@type":"CollegeOrUniversity","name":"University of Pau and Pays de l'Adour"}],"knowsAbout":["MLOps","Machine learning","Data science","Reservoir engineering"],"sameAs":["https://www.linkedin.com/in/richie-mouhouadi","https://github.com/rdmouhouadi","https://orcid.org/0009-0007-2470-2110"]}
+</script>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Richie Mouhouadi | Data Scientist and ML Engineer">
+<meta property="og:description" content="Former reservoir engineer turned data scientist and ML engineer, focused on putting models to work in production.">
+<meta property="og:url" content="https://rdmouhouadi.github.io/">
+<meta property="og:image" content="https://rdmouhouadi.github.io/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script>
+<style>
+:root{
+  --paper:#ebeee8; --ink:#131a16; --muted:#586259; --rule:#c3cabf; --blue:#2438d8;
+  --band:#131a16; --band-text:#ebeee8; --tile:#d3d9ce; --ghost:rgba(19,26,22,.07);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;
+  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme]){--paper:#0f1513; --ink:#e9ece4; --muted:#9aa49a; --rule:#2a3631; --blue:#8c98ff;
+    --band:#18211d; --band-text:#e9ece4; --tile:#222d28; --ghost:rgba(233,236,228,.06)}
+}
+:root[data-theme="dark"]{--paper:#0f1513; --ink:#e9ece4; --muted:#9aa49a; --rule:#2a3631; --blue:#8c98ff;
+    --band:#18211d; --band-text:#e9ece4; --tile:#222d28; --ghost:rgba(233,236,228,.06)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+.top{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.bar{display:flex;justify-content:space-between;align-items:center;padding-top:14px;padding-bottom:14px;font-size:15px}
+.top strong{font-weight:600}
+.top nav{display:flex;gap:26px}
+.top a{text-decoration:none}
+@media (hover:hover){.top a:hover{color:var(--blue)}}
+
+/* Cover */
+.cover{padding:64px 0 56px}
+.intro{padding:0 0 72px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,9.4vw,118px);line-height:.98;letter-spacing:-.02em;margin:0;max-width:13ch}
+h1 span{display:block;animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+h1 span:nth-child(2){animation-delay:.18s;font-style:italic;color:var(--blue)}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.deck{display:grid;grid-template-columns:240px 1fr;gap:40px;padding-top:8px}
+.byline{font-size:15px;color:var(--muted);line-height:1.5}
+.byline b{display:block;color:var(--ink);font-weight:600;font-size:17px}
+.deck p{margin:0 0 20px;max-width:34em;font-size:21px;line-height:1.5}
+.links{display:flex;flex-wrap:wrap;gap:24px;font-weight:500}
+.links a{text-decoration-thickness:2px;text-underline-offset:5px}
+.links a:hover{color:var(--blue)}
+
+/* Hello block */
+.hello{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:56px 0 88px;border-top:1px solid var(--ink)}
+.ghost{position:absolute;left:0;top:44px;margin:0;font-family:var(--sans);font-weight:800;font-size:clamp(40px,10.5vw,124px);line-height:.92;letter-spacing:-.02em;text-transform:uppercase;color:var(--ghost);pointer-events:none;user-select:none}
+.hello-text{position:relative;padding-top:clamp(64px,14vw,150px)}
+.hello h2{font-size:clamp(42px,6.4vw,76px);margin:0 0 22px}
+.role{font-size:22px;font-weight:600;line-height:1.35;margin:0 0 32px;max-width:15em}
+.social{display:flex;gap:14px}
+.social a{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--paper)}
+.social a:hover{background:var(--blue)}
+.social svg{width:22px;height:22px;fill:currentColor}
+.portrait{position:relative;min-height:490px}
+.ring{position:absolute;right:0;top:0;width:min(100%,380px);aspect-ratio:1;border:3px solid var(--ink);border-radius:50%}
+.avatar{position:absolute;left:8%;bottom:40px;width:200px;height:200px;border-radius:50%;overflow:hidden;background:var(--tile);display:grid;place-items:center;font-family:var(--display);font-size:80px}
+.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1)}
+.cap{position:absolute;left:8%;bottom:6px;width:200px;text-align:center;color:var(--muted);font-size:17px}
+
+/* Sections */
+section{padding:72px 0;border-top:1px solid var(--rule)}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(34px,5vw,52px);line-height:1.05;margin:0 0 36px;letter-spacing:-.01em}
+.cols{display:grid;grid-template-columns:240px 1fr;gap:40px}
+.label{font-size:15px;color:var(--muted);margin:6px 0 0}
+
+.story p{max-width:36em;margin:0 0 20px;font-size:20px}
+.story p:first-child::first-letter{font-family:var(--display);float:left;font-size:5.4em;line-height:.78;padding:6px 12px 0 0;color:var(--blue)}
+
+.pull{font-family:var(--display);font-style:italic;font-size:clamp(32px,5.6vw,64px);line-height:1.08;margin:0;max-width:21ch;letter-spacing:-.01em}
+
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.acts h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 8px;border-top:1px solid var(--ink);padding-top:14px}
+.acts p{margin:0;color:var(--muted);font-size:17px}
+
+/* Work list */
+.work{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--rule)}
+.work li{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:start;padding:28px 0;border-top:1px solid var(--rule)}
+.shot{position:relative;aspect-ratio:16/10;background:var(--tile);border:1px solid var(--rule);display:grid;place-items:center;overflow:hidden}
+.shot span{font-family:var(--display);font-size:28px;color:var(--muted)}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;filter:grayscale(1) contrast(1.05)}
+.work .stack{font-size:15px;font-weight:500;color:var(--ink);margin:0 0 14px}
+.work h3{margin-bottom:8px}
+.work h3{font-family:var(--display);font-weight:400;font-size:clamp(28px,3.6vw,40px);line-height:1.1;margin:0}
+.work p{margin:0;color:var(--muted);font-size:17px}
+.work a{font-weight:500;white-space:nowrap}
+.work li:hover h3{color:var(--blue)}
+
+.band{background:var(--band);color:var(--band-text);border-top:0;box-shadow:0 0 0 100vmax var(--band);clip-path:inset(0 -100vmax)}
+.skillgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px 48px}
+.skillgrid h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0 0 8px;padding-top:14px;border-top:1px solid rgba(235,238,232,.35)}
+.skillgrid p{margin:0;color:#b9c1b7;font-size:17px}
+.exp{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--rule)}
+.exp li{display:grid;grid-template-columns:170px 1fr;gap:32px;padding:28px 0;border-top:1px solid var(--rule)}
+.exp .when{color:var(--muted);font-size:16px;padding-top:6px}
+.exp h3{font-family:var(--display);font-weight:400;font-size:clamp(26px,3.2vw,36px);line-height:1.1;margin:0 0 8px}
+.exp p{margin:0;color:var(--muted);max-width:40em}
+.exp a,.more a{font-weight:500}
+.more{margin:24px 0 0}
+.creds{list-style:none;margin:0;padding:0}
+.creds li{padding:14px 0;border-top:1px solid var(--rule)}
+.creds li:first-child{border-top:0;padding-top:0}
+.creds span{display:block;color:var(--muted);font-size:16px}
+
+.close{padding:88px 0 64px;border-top:1px solid var(--ink)}
+.close a.mail{font-family:var(--display);font-size:clamp(26px,7.4vw,84px);line-height:1.05;text-decoration:none;overflow-wrap:break-word}
+.close a.mail:hover{color:var(--blue)}
+.close p{margin:28px 0 0;display:flex;gap:24px;flex-wrap:wrap;font-weight:500}
+
+@media (max-width:760px){
+  body{font-size:17px}
+  .top nav{position:relative;flex:1;min-width:0;overflow-x:auto;white-space:nowrap;gap:22px;scrollbar-width:none}
+  .top nav::-webkit-scrollbar{display:none}
+  .top nav a{font-size:15px;padding:6px 0}
+  .theme{position:fixed;right:14px;bottom:14px;z-index:10;background:var(--paper);box-shadow:0 2px 10px rgba(0,0,0,.2)}
+  .top strong{display:none}
+  .bar{justify-content:flex-end}
+  .cover{padding:36px 0 40px}
+  .hello{grid-template-columns:1fr;padding:40px 0 64px}
+  .portrait{min-height:400px}
+  .ring{width:290px}
+  .avatar{width:160px;height:160px;font-size:64px;bottom:40px}
+  .cap{width:160px}
+  .deck,.cols{grid-template-columns:1fr;gap:18px}
+  .deck p{font-size:19px}
+  .acts{grid-template-columns:1fr;gap:28px}
+  .work li{grid-template-columns:1fr;gap:18px}
+  .skillgrid{grid-template-columns:1fr;gap:28px}
+  .exp li{grid-template-columns:1fr;gap:4px}
+  section{padding:56px 0}
+}
+@media (prefers-reduced-motion:reduce){h1 span{animation:none}html{scroll-behavior:auto}}
+
+.theme{width:38px;height:38px;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+@media (hover:hover){.theme:hover{border-color:var(--blue);color:var(--blue)}}
+.theme svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme .sun{display:none}
+:root[data-theme="dark"] .theme .sun{display:block}
+:root[data-theme="dark"] .theme .moon{display:none}
+.close .social{margin-top:32px}
+.cv{display:inline-block;margin-top:28px;padding:13px 24px;background:var(--ink);color:var(--paper);font-weight:600;text-decoration:none;border-radius:4px}
+.cv:hover{background:var(--blue);color:var(--paper)}
+.close .note{display:block;font-weight:400;font-size:21px;line-height:1.5;max-width:30em;margin:0 0 28px;color:var(--muted)}
+.work .info a+a{margin-left:22px}
+
+/* V2 refinements */
+::selection{background:var(--blue);color:var(--paper)}
+h1,h2,h3,.pull{text-wrap:balance}
+p,li{text-wrap:pretty}
+.skip{position:absolute;left:12px;top:-64px;z-index:50;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600}
+.skip:focus{top:12px}
+.top nav a[aria-current]{color:var(--blue);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:7px}
+.shot img,.avatar img{transition:filter .35s}
+.work li:hover .shot img,.avatar:hover img{filter:none}
+.pull{font-size:clamp(38px,7.4vw,96px);line-height:1.04;max-width:20ch}
+.pullsec{padding:112px 0}
+@media (max-width:760px){.pullsec{padding:64px 0}}
+/* Dividers: full line between sections, short dashed line between items inside one */
+:root{--dash:#a1a99d}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--dash:#4b5953}}
+:root[data-theme="dark"]{--dash:#4b5953}
+.work,.exp{border-bottom:0}
+.work li,.exp li{border-top:0}
+.work li+li,.exp li+li{background:repeating-linear-gradient(90deg,var(--dash) 0 5px,transparent 5px 10px) no-repeat 0 0/110px 1px}
+/* Built inside companies: timeline */
+.inside{margin-top:88px}
+.inside h3{font-family:var(--display);font-weight:400;font-size:clamp(28px,3.8vw,40px);line-height:1.1;margin:0 0 8px}
+.sub-note{margin:0 0 40px;color:var(--muted);max-width:36em}
+.timeline{list-style:none;margin:0;padding:0 0 0 36px;position:relative}
+.timeline::before{content:"";position:absolute;left:6px;top:10px;bottom:10px;width:1px;background:var(--muted);opacity:.45}
+.timeline li{position:relative;padding:0 0 36px}
+.timeline li:last-child{padding-bottom:0}
+.timeline li::before{content:"";position:absolute;left:-36px;top:9px;width:9px;height:9px;border-radius:50%;background:var(--paper);border:2px solid var(--blue);box-sizing:content-box}
+.timeline li.now::before{background:var(--blue)}
+.tl-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,3vw,32px);line-height:1.15;margin:0 0 6px}
+.tl-title a{text-decoration:none}
+@media (hover:hover){.tl-title a:hover{color:var(--blue)}}
+.tl-meta{margin:0;color:var(--muted);font-size:16px}
+.tl-read{display:inline-block;margin-top:10px;font-size:16px}
+.tl-soon{display:inline-block;margin-top:10px;padding:2px 12px;border:1px solid var(--rule);border-radius:99px;color:var(--muted);font-size:14px}
+/* More projects: sideways card row */
+.more-projects{margin-top:88px}
+.more-projects h3{font-family:var(--display);font-weight:400;font-size:clamp(28px,3.8vw,40px);line-height:1.1;margin:0 0 6px}
+.mp-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 24px;flex-wrap:wrap;margin:0 0 28px}
+.mp-head .sub-note{margin:0}
+.mp-tools{display:flex;align-items:center;gap:10px}
+.mp-arrow{width:38px;height:38px;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.mp-arrow[hidden]{display:none}
+.mp-arrow:disabled{opacity:.35;cursor:default}
+@media (hover:hover){.mp-arrow:not(:disabled):hover{border-color:var(--blue);color:var(--blue)}}
+.mp-all{font-weight:500;text-decoration:none;white-space:nowrap;margin-left:6px}
+@media (hover:hover){.mp-all:hover{color:var(--blue)}}
+.mp-row{border-top:0;break-inside:auto;display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 14px;margin:0 -2px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.mp-card{flex:1 1 300px;min-width:280px;max-width:520px;scroll-snap-align:start;border:1px solid var(--rule);border-radius:4px;padding:24px;display:flex;flex-direction:column}
+.mp-tag{font-size:14px;color:var(--muted);margin:0 0 10px}
+.mp-card h4{font-family:var(--display);font-weight:400;font-size:clamp(26px,3vw,32px);line-height:1.1;margin:0 0 10px}
+.mp-card p{margin:0 0 12px;color:var(--muted);font-size:16.5px;line-height:1.5}
+.mp-card .stack{color:var(--ink);font-weight:500;font-size:15px;margin-top:auto;padding-top:4px}
+.mp-links{margin-top:14px;display:flex;gap:22px;flex-wrap:wrap;font-weight:500}
+@media (max-width:760px){.mp-card{flex:0 0 82%;min-width:0;max-width:none}.mp-arrow{display:none}.more-projects{margin-top:72px}}
+@media print{
+  :root,:root[data-theme="dark"]{--paper:#fff;--ink:#000;--muted:#444;--rule:#ccc;--blue:#000;--band:#fff;--band-text:#000;--tile:#eee;--ghost:transparent;--dash:#999}
+  body{font-size:11pt}
+  .top,.theme,.skip,.ghost,.ring,.shot,.cv,.hello .social{display:none}
+  .band{box-shadow:none;clip-path:none;border-top:1px solid #ccc}
+  .skillgrid p{color:#333}
+  section{padding:16pt 0;break-inside:avoid}
+  .cover{padding:12pt 0}
+  h1{font-size:34pt}
+  .pull,.pullsec .pull{font-size:24pt}
+  .pullsec{padding:16pt 0}
+  .hello{padding:12pt 0;grid-template-columns:1fr}
+  .portrait{min-height:0}
+  .avatar{position:static;width:90pt;height:90pt;margin-bottom:6pt}
+  .cap{position:static}
+  .work li{grid-template-columns:1fr;gap:4pt}
+  .work a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}
+  .close{padding:16pt 0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+<div class="wrap bar">
+  <strong>Richie</strong>
+  <nav aria-label="Primary">
+    <a href="#about">About me</a>
+    <a href="#work">Work</a>
+    <a href="#skills">Skills</a>
+    <a href="#experience">Experience</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+    <button class="theme" type="button" aria-label="Switch between light and dark mode">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </nav>
+</div>
+</header>
+
+<div class="wrap">
+<main id="main">
+<div class="cover">
+  <h1><span>I used to model what lies underground.</span><span>Now I keep models running in the real world.</span></h1>
+</div>
+
+<div class="hello">
+  <p class="ghost" aria-hidden="true">Data scientist &amp; ML engineer</p>
+  <div class="hello-text">
+    <h2>Hello, I’m Richie</h2>
+    <p class="role">Data scientist and ML engineer, with a sweet spot for MLOps.</p>
+    <div class="social">
+      <a href="https://www.linkedin.com/in/richie-mouhouadi" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zm1.782 13.019H3.555V9h3.564v11.452z"/></svg></a>
+      <a href="https://github.com/rdmouhouadi" aria-label="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 0 1 3-.404c1.02.005 2.047.138 3 .404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      <a href="mailto:rd.mouhouadi@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1.5 2.2V8l7.5 5 7.5-5v-.8L12 12.2 4.5 7.2z"/></svg></a>
+    </div>
+  </div>
+  <div class="portrait">
+    <div class="ring"></div>
+    <div class="avatar"><span aria-hidden="true">R</span><img src="photo.jpg" alt="Portrait of Richie" onerror="this.remove()"></div>
+    <p class="cap">Richie Mouhouadi</p>
+  </div>
+</div>
+
+<div class="intro">
+  <div class="deck">
+    <div class="byline">Paris, France</div>
+    <div>
+      <p>I’m a former reservoir engineer finishing a degree in data science. I care most about the unglamorous middle of machine learning: getting a good model out of the notebook and keeping it trustworthy once people depend on it.</p>
+      <div class="links">
+        <a href="#work">Selected work</a>
+        <a href="resume.pdf">Resume (PDF)</a>
+        <a href="#contact">Get in touch</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="about">
+  <div class="cols">
+    <p class="label">About me</p>
+    <div class="story">
+      <p>For several years I worked in reservoir engineering R&amp;D, with data that was always incomplete and models that were never quite right. You learn quickly to doubt your own assumptions, to check a prediction against what actually happened, and to explain a result to someone who has to act on it.</p>
+      <p>Those habits turned out to be exactly what machine learning in production demands. Most of the work below started with a method I had never used before, and I stayed with each one until I understood why it worked, or why it didn&rsquo;t. Today I’m completing an MSc in Data Science &amp; AI at DSTI while working as the data person in the smart metering international department at SUEZ Digital Solutions, and I’m looking for MLOps and ML engineering roles where reliability matters as much as accuracy.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pullsec" aria-label="Pull quote">
+  <p class="pull">The model was never the hard part. Keeping it right and relevant was.</p>
+</section>
+
+<section>
+  <h2>Three chapters, one thread</h2>
+  <div class="acts">
+    <div><h3>Then</h3><p>Reservoir engineering: forecasting, uncertainty, and decisions with real money attached.</p></div>
+    <div><h3>Now</h3><p>Data science and machine learning, learned with an engineer’s habit of testing everything.</p></div>
+    <div><h3>Next</h3><p>MLOps: building the systems that deploy, watch, and improve models over time.</p></div>
+  </div>
+</section>
+
+<section id="work">
+  <h2>Selected work</h2>
+  <ul class="work">
+    <li>
+      <div class="shot"><span>MESA</span><img src="images/mesa.jpg" width="1000" height="625" alt="Charts of the MESA results: the composite score rises slowly and jumps at scarcity 0.95, where the hierarchical team collapses most often." onerror="this.remove()"></div>
+      <div class="info">
+        <h3>MESA: when honest AI agents fail together</h3>
+        <p>An agent-based model of AI agents sharing a limited budget. Their reports degrade quietly, then the whole team collapses. Before the experiments, an AI-assisted review showed the first model broke its own spec in six places; I fixed them all. Then five experiments, 4,080 runs, a full paper and a simulator you can run.</p>
+        <p class="stack">NetLogo 7, BehaviorSpace, Python, SciPy, Excel (Power Query)</p>
+        <a href="case-studies/mesa-simulator.html">Try it</a>
+        <a href="case-studies/mesa-emergent-misalignment.html">Case study</a>
+        <a href="case-studies/files/MESA_paper.pdf" download>Paper (PDF)</a>
+      </div>
+    </li>
+    <li>
+      <div class="shot"><span>DocKA</span><img src="images/docka.jpg" alt="Diagram of the DocKA pipeline" onerror="this.remove()"></div>
+      <div class="info">
+        <h3>DocKA</h3>
+        <p>An open-source tool that turns PDFs, Word and web documents into a searchable knowledge base, running entirely on your own infrastructure.</p>
+        <p class="stack">Python, FastAPI, Elasticsearch, PostgreSQL, Airflow, Docker</p>
+        <a href="https://github.com/rdmouhouadi/Docka#readme">Code and README</a>
+      </div>
+    </li>
+  </ul>
+
+  <div class="more-projects">
+    <div class="mp-head">
+      <div>
+        <h3>More projects</h3>
+        <p class="sub-note">Products I built and shipped on my own.</p>
+      </div>
+      <div class="mp-tools">
+        <button type="button" class="mp-arrow" id="mp-prev" aria-label="Previous projects" hidden>&larr;</button>
+        <button type="button" class="mp-arrow" id="mp-next" aria-label="Next projects" hidden>&rarr;</button>
+        <a class="mp-all" href="https://github.com/rdmouhouadi?tab=repositories">View all on GitHub &rarr;</a>
+      </div>
+    </div>
+    <section class="mp-row" id="mp-row" aria-label="More projects" tabindex="0">
+      <article class="mp-card">
+        <p class="mp-tag">Product &middot; Live beta</p>
+        <h4>BuilderLab</h4>
+        <p>A platform where builders and learners deliver work as a team. Hardened after an independent code review: lint errors from 54 to 0, plus CI and row-level security.</p>
+        <p class="stack">Next.js, TypeScript, Supabase, Docker, GitHub Actions</p>
+        <div class="mp-links"><a href="https://builderlab-tau.vercel.app/">Try it</a><a href="https://github.com/rdmouhouadi/BuilderLab#readme">Code and README</a></div>
+      </article>
+      <article class="mp-card">
+        <p class="mp-tag">Product &middot; In development</p>
+        <h4>StackPuls</h4>
+        <p>Reads cloud alert emails with an LLM and gathers them into a single dashboard for solo builders.</p>
+        <p class="stack">TypeScript, Neon Postgres, Vercel, Groq, Cloudflare Workers</p>
+        <div class="mp-links"><a href="https://stakpuls.com/">Visit the landing page</a></div>
+      </article>
+    </section>
+  </div>
+
+  <div class="inside">
+    <h3>Built inside companies</h3>
+    <p class="sub-note">The code stays private, so I write about the work instead.</p>
+    <ol class="timeline">
+      <li class="now">
+        <h4 class="tl-title">Predictive maintenance for smart meters</h4>
+        <p class="tl-meta">SUEZ Digital Solutions &middot; 2025&ndash;present</p>
+        <span class="tl-soon">Write-up coming soon</span>
+      </li>
+      <li class="now">
+        <h4 class="tl-title">What drives adoption of prepaid smart water</h4>
+        <p class="tl-meta">SUEZ Digital Solutions &middot; 2025&ndash;present</p>
+        <span class="tl-soon">Write-up coming soon</span>
+      </li>
+      <li>
+        <h4 class="tl-title"><a href="case-studies/generative-model-simulation.html">Can a GAN stand in for a slow geological simulation?</a></h4>
+        <p class="tl-meta">Beicip-Franlab &middot; 2024</p>
+        <a class="tl-read" href="case-studies/generative-model-simulation.html">Read the case study</a>
+      </li>
+      <li>
+        <h4 class="tl-title"><a href="case-studies/oil-production-forecasting.html">Forecasting a whole oilfield with a graph neural network</a></h4>
+        <p class="tl-meta">Beicip-Franlab &middot; 2024</p>
+        <a class="tl-read" href="case-studies/oil-production-forecasting.html">Read the case study</a>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="skills" class="band">
+  <h2>Skills</h2>
+  <div class="skillgrid">
+    <div><h3>MLOps and DevOps</h3><p>Docker, GitHub Actions, Airflow, CI/CD. DevOps Bootcamp in progress.</p></div>
+    <div><h3>Data and machine learning</h3><p>Python, SQL, Power BI. Generative models and LSTM forecasting.</p></div>
+    <div><h3>Cloud</h3><p>AWS, Vercel, Cloudflare Workers.</p></div>
+    <div><h3>Building</h3><p>TypeScript, React and Next.js, FastAPI, Supabase.</p></div>
+  </div>
+</section>
+
+<section id="experience">
+  <h2>Experience, in brief</h2>
+  <ul class="exp">
+    <li>
+      <span class="when">2025&ndash;2027</span>
+      <div>
+        <h3>SUEZ Digital Solutions, smart metering apprentice</h3>
+        <p>Supporting prepaid smart-water pilots in Senegal and Angola, 5,000 meters each. Building the MLOps foundation for predictive maintenance of meters and gateways, plus a study of 10,000+ households to inform tenders.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">2024</span>
+      <div>
+        <h3>Beicip-Franlab, reservoir engineer intern</h3>
+        <p>Tested two machine learning shortcuts for slow reservoir workflows. A GAN trained on about 130 maps captured the right geology but lost to simpler models; a graph neural network matched the field&rsquo;s history but failed what-if tests. Both write-ups explain why.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">2020&ndash;2023</span>
+      <div>
+        <h3>Chang’an University, R&amp;D reservoir engineer</h3>
+        <p>Contributed to 3 scientific papers and 1 patent application. <a href="https://orcid.org/0009-0007-2470-2110">See my ORCID record</a>.</p>
+      </div>
+    </li>
+  </ul>
+  <p class="more"><a href="resume.pdf">The full story is in my resume</a></p>
+</section>
+
+<section id="education">
+  <h2>Education</h2>
+  <ul class="exp">
+    <li>
+      <span class="when">2025&ndash;2027</span>
+      <div>
+        <h3>MSc Data Science &amp; AI</h3>
+        <p>DSTI School of Engineering, Paris. Expected March 2027.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">2025&ndash;present</span>
+      <div>
+        <h3>DevOps Bootcamp</h3>
+        <p>TechWorld with Nana, online. In progress.</p>
+      </div>
+    </li>
+    <li>
+      <span class="when">2023&ndash;2024</span>
+      <div>
+        <h3>MSc Geoenergies</h3>
+        <p>University of Pau and Pays de l&rsquo;Adour, France.</p>
+      </div>
+    </li>
+  </ul>
+</section>
+</main>
+
+<footer class="close" id="contact">
+  <h2>Let’s talk</h2>
+  <p class="note">I’m open to MLOps and ML engineering roles. I’m just as glad to hear from fellow engineers and builders, no agenda needed.</p>
+  <a class="mail" href="mailto:rd.mouhouadi@gmail.com">rd.mouhouadi<wbr>@gmail.com</a>
+  <div class="social">
+      <a href="https://www.linkedin.com/in/richie-mouhouadi" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zm1.782 13.019H3.555V9h3.564v11.452z"/></svg></a>
+      <a href="https://github.com/rdmouhouadi" aria-label="GitHub"><svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 0 1 3-.404c1.02.005 2.047.138 3 .404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+      <a href="mailto:rd.mouhouadi@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1.5 2.2V8l7.5 5 7.5-5v-.8L12 12.2 4.5 7.2z"/></svg></a>
+    </div>
+    <a class="cv" href="resume.pdf" download="Richie_Mouhouadi_CV.pdf">Download my CV</a>
+</footer>
+
+</div>
+<!-- Visitor stats: create a free account at goatcounter.com, then uncomment this line and replace YOURCODE.
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+<script>
+document.querySelector(".theme").addEventListener("click",function(){
+  var r=document.documentElement,n=r.dataset.theme==="dark"?"light":"dark";
+  r.dataset.theme=n;
+  try{localStorage.setItem("theme",n)}catch(e){}
+});
+</script>
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.top nav a[href^="#"]'));
+  var byId={};links.forEach(function(a){byId[a.getAttribute("href").slice(1)]=a});
+  var sections=links.map(function(a){return document.getElementById(a.getAttribute("href").slice(1))}).filter(Boolean);
+  var current=null,ticking=false,locked=null;
+  function mark(id){
+    if(id===current)return;
+    current=id;
+    links.forEach(function(l){l.removeAttribute("aria-current")});
+    var a=byId[id];
+    if(a){
+      a.setAttribute("aria-current","true");
+      var n=a.parentNode;
+      if(n.scrollWidth>n.clientWidth)n.scrollTo({left:a.offsetLeft-(n.clientWidth-a.offsetWidth)/2,behavior:"smooth"});
+    }
+  }
+  function spy(){
+    ticking=false;
+    if(locked)return;
+    var line=window.innerHeight*0.35,id="";
+    sections.forEach(function(el){if(el.getBoundingClientRect().top<=line)id=el.id});
+    if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4)id="contact";
+    mark(id);
+  }
+  function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(spy)}}
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll);
+  links.forEach(function(a){a.addEventListener("click",function(){locked=a.getAttribute("href").slice(1);mark(locked)})});
+  function unlock(e){
+    if(!locked)return;
+    if(e.type==="keydown"&&e.key==="Enter")return;
+    if(e.type!=="keydown"&&e.target.closest&&e.target.closest(".top nav"))return;
+    locked=null;onScroll();
+  }
+  ["wheel","touchstart","mousedown","keydown"].forEach(function(t){window.addEventListener(t,unlock,{passive:true})});
+  spy();
+})();
+</script>
+<script>
+(function(){
+  var row=document.getElementById("mp-row"),prev=document.getElementById("mp-prev"),next=document.getElementById("mp-next");
+  if(!row)return;
+  var calm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function upd(){
+    var over=row.scrollWidth>row.clientWidth+4;
+    prev.hidden=next.hidden=!over;
+    if(over){prev.disabled=row.scrollLeft<=2;next.disabled=row.scrollLeft+row.clientWidth>=row.scrollWidth-2}
+  }
+  function go(dir){row.scrollBy({left:dir*row.clientWidth*0.8,behavior:calm?"auto":"smooth"})}
+  prev.onclick=function(){go(-1)};next.onclick=function(){go(1)};
+  row.addEventListener("scroll",upd,{passive:true});window.addEventListener("resize",upd);upd();
+})();
+</script>
+</body>
+</html>
