@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MESA simulator | Richie Mouhouadi</title>
+<meta name="description" content="Run the MESA agent-based model in your browser: raise the scarcity and watch honest AI agents drift, then fail together.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+.body{min-width:0}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+.dl{display:inline-flex;align-items:center;gap:10px;margin:0 0 56px;padding:12px 20px;border:1px solid var(--ink);border-radius:999px;font-size:16px;font-weight:500;text-decoration:none}
+@media (hover:hover){.dl:hover{background:var(--blue);border-color:var(--blue);color:var(--paper)}}
+
+:root{--bad:#c0392b}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--bad:#ff8a7a}}
+:root[data-theme="dark"]{--bad:#ff8a7a}
+.simh{font-family:var(--display);font-weight:400;font-size:clamp(40px,6vw,64px);line-height:1;margin:40px 0 16px;letter-spacing:-.02em}
+.sl{font-size:clamp(18px,2.2vw,22px);line-height:1.5;max-width:36em;margin:0 0 36px}
+.sl a{text-underline-offset:4px}
+.sim{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:start}
+.sim canvas{display:block;width:100%;border:1px solid var(--rule);border-radius:4px;background:var(--paper)}
+#net{aspect-ratio:1/1}
+#chart{aspect-ratio:560/190;margin-top:18px}
+.legend{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:12px 0 0;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--blue)}
+.legend i.f{opacity:.35}
+.legend i.x{background:none;color:var(--bad);width:auto;height:auto;border-radius:0;font-style:normal;font-weight:700;line-height:1}
+.legend i.m{border-radius:2px;background:var(--muted)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.btn{font:inherit;font-weight:600;font-size:15px;padding:10px 18px;border-radius:4px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink)}
+.presets .btn{padding:6px 12px;font-weight:500;font-size:14px}
+@media (hover:hover){.btn:hover{background:var(--blue);border-color:var(--blue);color:var(--paper)}}
+.ctl .row{margin:0 0 14px}
+.ctl label{display:flex;justify-content:space-between;gap:12px;font-size:15px;margin:0 0 4px}
+.ctl output{font-weight:600}
+input[type=range]{width:100%;accent-color:var(--blue)}
+select{font:inherit;font-size:16px;padding:8px 10px;background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:4px;width:100%}
+.checks{display:flex;gap:22px;flex-wrap:wrap;font-size:15px;margin:4px 0 18px}
+.checks label{display:flex;gap:8px;align-items:center}
+.checks input{accent-color:var(--blue);width:18px;height:18px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.phase{display:inline-block;padding:4px 14px;border:1px solid var(--rule);border-radius:99px;font-weight:600;font-size:14px;margin:20px 0 14px}
+.phase.w{border-color:var(--blue);color:var(--blue)}
+.phase.c{border-color:var(--bad);color:var(--bad)}
+.read{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px;margin:0}
+.read dt{font-size:13px;color:var(--muted)}
+.read dd{margin:0;font-family:var(--display);font-size:26px;line-height:1.1}
+#status{min-height:1.6em;font-size:15px;color:var(--muted);margin:14px 0 0}
+.note{font-size:15px;line-height:1.55;color:var(--muted);max-width:46em;margin:44px 0 0}
+.note a{text-underline-offset:3px}
+@media (max-width:860px){.sim{grid-template-columns:1fr}.read{grid-template-columns:repeat(2,1fr)}}
+/* consistent link hover */
+@media (hover:hover){a:hover{color:var(--blue)}}
+</style>
+</head>
+<body>
+<!-- REVIEW before publishing: check that nothing confidential remains. -->
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="mesa-emergent-misalignment.html">&larr; Case study</a>
+</header>
+
+<main>
+  <h1 class="simh">MESA simulator</h1>
+  <p class="sl">Honest agents sharing one budget. Raise the scarcity and watch the team drift, then fail together. This is a browser version of the model from the <a href="mesa-emergent-misalignment.html">case study</a>.</p>
+  <div class="sim">
+    <div class="stage">
+      <canvas id="net" role="img" aria-label="Network of worker agents around an orchestrator. Workers fade as their trust falls and turn into red crosses when they die."></canvas>
+      <ul class="legend"><li><i></i>trusted worker</li><li><i class="f"></i>less trusted</li><li><i class="x">&times;</i>dead worker</li><li><i class="m"></i>monitor (red = alarm)</li></ul>
+    </div>
+    <div class="panel">
+      <div class="presets" role="group" aria-label="Presets">
+        <button type="button" class="btn alt" data-p="calm">Calm</button>
+        <button type="button" class="btn alt" data-p="drift">Drift</button>
+        <button type="button" class="btn alt" data-p="edgeStar">Edge, star</button>
+        <button type="button" class="btn alt" data-p="edgeHier">Edge, hierarchy</button>
+      </div>
+      <div class="ctl">
+        <div class="row"><label for="scarcity">Scarcity <output id="o_scarcity">0.50</output></label><input type="range" id="scarcity" min="0.1" max="0.95" step="0.05" value="0.5"></div>
+        <div class="row"><label for="topology">Team structure</label><select id="topology"><option>Star</option><option>Ring</option><option>Hierarchical</option></select></div>
+        <div class="row"><label for="N">Workers <output id="o_N">50</output></label><input type="range" id="N" min="10" max="100" step="5" value="50"></div>
+        <div class="row"><label for="thr">Survival threshold <output id="o_thr">3.00</output></label><input type="range" id="thr" min="1" max="5" step="0.25" value="3"></div>
+        <div class="checks"><label><input type="checkbox" id="bias" checked>Under-reporting rule</label><label><input type="checkbox" id="mon" checked>Monitor</label></div>
+        <div class="row"><label for="speed">Speed <output id="o_speed">20 ticks/s</output></label><input type="range" id="speed" min="1" max="60" step="1" value="20"></div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="play">Play</button><button type="button" class="btn alt" id="step">Step</button><button type="button" class="btn alt" id="reset">New run</button></div>
+      <div class="phase" id="phase">STABLE</div>
+      <dl class="read">
+        <div><dt>Tick</dt><dd id="r_tick">0</dd></div>
+        <div><dt>Workers alive</dt><dd id="r_alive">50</dd></div>
+        <div><dt>Composite</dt><dd id="r_comp">0.000</dd></div>
+        <div><dt>Info asymmetry (IAI)</dt><dd id="r_iai">0.000</dd></div>
+        <div><dt>Task drift (TCD)</dt><dd id="r_tcd">0.000</dd></div>
+        <div><dt>Oversight erosion (OER)</dt><dd id="r_oer">0.000</dd></div>
+        <div><dt>Inequality (Gini)</dt><dd id="r_gini">0.000</dd></div>
+        <div><dt>Workers lost</dt><dd id="r_cfp">0%</dd></div>
+        <div><dt>Tasks per worker</dt><dd id="r_done">0.0</dd></div>
+      </dl>
+      <canvas id="chart" role="img" aria-label="Line chart over time of the composite score, the information asymmetry index and the share of workers alive."></canvas>
+      <p id="status" aria-live="polite"></p>
+    </div>
+  </div>
+  <p class="note"><b>How to read it.</b> Each blue dot is a worker; it fades as the orchestrator trusts it less and grows as it nears the end of a subtask. Try <b>Drift</b> to see reports degrade without any deaths, then <b>Edge, hierarchy</b> to see the team collapse, and run it a few times: collapse is random, not certain. The <b>survival threshold</b> decides where the cliff is. Results are for 200 ticks per run.</p>
+  <p class="note"><b>Verification.</b> This version re-implements the NetLogo model (v2). Over 100 to 300 runs it reproduces the published numbers within sampling error: at scarcity 0.5 the information gap is 0.034 (paper: 0.034), and at scarcity 0.95 the hierarchy collapses in about 86% of runs against about 50% for the star (paper, 30 runs each: 83% and 43%). The full results are in <a href="mesa-emergent-misalignment.html">the case study</a> and <a href="files/MESA_paper.pdf" download>the paper</a>.</p>
+</main>
+
+<footer class="foot">
+  <a href="mesa-emergent-misalignment.html">&larr; Case study</a>
+  <p>Course project for Agent-Based Modelling (Georgiy Bobashev, DSTI), extended as a personal study. Model files and data are available on request.</p>
+</footer>
+</div>
+<script>
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function MesaSim(p){this.p=p;this.reset(p.seed)}
+MesaSim.prototype.reset=function(seed){
+  var p=this.p,N=p.N,i;this.rand=mulberry32((seed>>>0)||1);
+  this.N=N;this.tick=0;this.finished=false;this.reason='';
+  this.trueP=new Float64Array(N);this.rep=new Float64Array(N);this.held=new Float64Array(N);
+  this.trust=new Float64Array(N).fill(1);this.logR=new Float64Array(N).fill(1);this.press=new Float64Array(N);
+  this.last=new Float64Array(N);this.alive=new Uint8Array(N).fill(1);this.broker=new Int16Array(N).fill(-1);
+  this.inner=new Uint8Array(N);var nin=0;
+  for(i=0;i<N;i++){if(i<N/2){this.inner[i]=1;nin++}}
+  if(p.topology==='Hierarchical'){for(i=0;i<N;i++){if(!this.inner[i])this.broker[i]=Math.floor(this.rand()*nin)}}
+  this.casc=0;this.done=0;this.anom=0;this.believed=0;
+  this.iai=0;this.gini=0;this.tcd=0;this.oer=0;this.comp=0;this.phase=0;this.nAlive=N;
+  this.firstWarn=-1;this.firstCrit=-1;this.hist=[];
+};
+MesaSim.prototype.step=function(){
+  if(this.finished)return;
+  var p=this.p,N=this.N,s=p.scarcity,r=this.rand,i,j,al=this.alive,n=0;
+  for(i=0;i<N;i++)if(al[i])n++;
+  if(n===0){this.finished=true;this.reason='all workers dead';return}
+  var base=Math.floor(N*10*(1-0.8*s))/N,ideal=10*N/n;
+  for(i=0;i<N;i++){if(!al[i])continue;
+    this.held[i]=Math.min(base*(0.7+0.6*this.trust[i]),1.5*base);
+    this.press[i]=Math.max(0,1-this.held[i]/ideal);}
+  for(i=0;i<N;i++){if(!al[i])continue;
+    this.trueP[i]+=this.held[i]/80;
+    if(this.trueP[i]>=1){this.done++;this.trueP[i]=0;this.last[i]=0}}
+  var direct=new Uint8Array(N),ok=new Uint8Array(N);
+  for(i=0;i<N;i++){if(!al[i])continue;
+    var pr=this.press[i],noise=pr*0.3*r(),b=0;
+    if(p.bias&&pr>0.5)b=r()*0.2-0.15;
+    this.rep[i]=Math.min(1,Math.max(0,this.trueP[i]-noise+b));
+    this.logR[i]=Math.max(0.05,1-pr*0.8*r());}
+  for(i=0;i<N;i++){if(al[i])direct[i]=r()<this.logR[i]?1:0}
+  for(i=0;i<N;i++){if(!al[i])continue;ok[i]=direct[i];
+    if(p.topology==='Ring'){var nx=(i+1)%N;var relay=al[nx]&&r()<this.logR[nx];if(relay)ok[i]=1;}
+    else if(p.topology==='Hierarchical'&&this.broker[i]>=0){var bk=this.broker[i];
+      ok[i]=(direct[i]&&al[bk]&&r()<this.logR[bk])?1:0;}}
+  var sm=0;
+  for(i=0;i<N;i++){if(al[i]&&ok[i])this.last[i]=this.rep[i];if(al[i])sm+=this.last[i]}
+  this.believed=sm/n;
+  for(i=0;i<N;i++){if(al[i])this.trust[i]=this.trust[i]*0.9+(1-Math.abs(this.rep[i]-this.believed))*0.1}
+  if(p.monitor){var idx=[];for(i=0;i<N;i++)if(al[i])idx.push(i);
+    var k=Math.max(1,Math.round(0.2*n*(1-s))),tot=0;
+    for(j=0;j<k;j++){var q=j+Math.floor(r()*(idx.length-j)),t=idx[j];idx[j]=idx[q];idx[q]=t;tot+=Math.abs(this.trueP[idx[j]]-this.rep[idx[j]])}
+    this.anom=this.anom*0.8+(tot/k)*0.2;}
+  var dead=[];for(i=0;i<N;i++)if(al[i]&&this.held[i]<p.threshold)dead.push(i);
+  for(var d=0;d<dead.length;d++){i=dead[d];if(!al[i])continue;al[i]=0;this.casc++;
+    if(p.topology==='Hierarchical'&&this.inner[i]){for(j=0;j<N;j++){if(al[j]&&this.broker[j]===i&&r()<0.5){al[j]=0;this.casc++}}}}
+  var m=0,mt=0,mi=0,ml=0,xs=[];
+  for(i=0;i<N;i++){if(!al[i])continue;m++;mt+=this.trueP[i];mi+=Math.abs(this.trueP[i]-this.rep[i]);ml+=this.logR[i];xs.push(this.held[i])}
+  this.nAlive=m;
+  if(m===0){this.iai=this.gini=this.tcd=this.oer=1;this.phase=2;}
+  else{
+    this.iai=mi/m;xs.sort(function(a,b){return a-b});var tot2=0,gs=0;
+    for(i=0;i<m;i++){tot2+=xs[i];gs+=(2*(i+1)-m-1)*xs[i]}
+    this.gini=tot2>0?Math.abs(gs/(m*tot2)):0;
+    this.tcd=Math.abs(this.believed-mt/m);this.oer=1-ml/m;
+    this.comp=this.iai*.25+this.gini*.2+this.tcd*.25+this.oer*.15+(this.casc/N)*.15;
+    this.phase=this.comp>=.45?2:(this.comp>=.28?1:0);
+  }
+  if(this.phase>=1&&this.firstWarn<0)this.firstWarn=this.tick;
+  if(this.phase>=2&&this.firstCrit<0)this.firstCrit=this.tick;
+  this.tick++;
+  this.hist.push([this.comp,this.iai,m/N]);
+  if(m===0){this.finished=true;this.reason='all workers dead'}
+  else if(this.tick>=p.maxTicks){this.finished=true;this.reason='200 ticks reached'}
+};
+
+(function(){
+var $=function(id){return document.getElementById(id)};
+var els={scarcity:$('scarcity'),topology:$('topology'),N:$('N'),thr:$('thr'),bias:$('bias'),mon:$('mon'),speed:$('speed')};
+var cv=$('net'),ctx=cv.getContext('2d'),ch=$('chart'),cx2=ch.getContext('2d');
+var state={playing:false,acc:0,last:0},sim,pos=[];
+function params(){return{N:+els.N.value,topology:els.topology.value,scarcity:+els.scarcity.value,threshold:+els.thr.value,bias:els.bias.checked,monitor:els.mon.checked,maxTicks:200,seed:(Math.random()*4294967295)>>>0}}
+function cols(){var s=getComputedStyle(document.documentElement);function g(n){return s.getPropertyValue(n).trim()}return{ink:g('--ink'),paper:g('--paper'),muted:g('--muted'),blue:g('--blue'),rule:g('--rule'),bad:g('--bad'),font:getComputedStyle(document.body).fontFamily}}
+function fit(c){var d=window.devicePixelRatio||1,w=Math.round(c.clientWidth*d),h=Math.round(c.clientHeight*d);if(c.width!==w||c.height!==h){c.width=w;c.height=h}return d}
+function layout(){var N=sim.N,i,a,b;pos=[];
+  if(sim.p.topology==='Hierarchical'){var nin=0,g={};for(i=0;i<N;i++)if(sim.inner[i])nin++;
+    for(i=0;i<N;i++){if(sim.inner[i]){a=2*Math.PI*i/nin-Math.PI/2;pos[i]={x:0.40*Math.cos(a),y:0.40*Math.sin(a),a:a}}else{(g[sim.broker[i]]=g[sim.broker[i]]||[]).push(i)}}
+    for(b in g){var l=g[b],m=l.length,sp=Math.min(0.32,2*Math.PI/nin/(m+0.5)),ab=pos[+b].a;
+      for(var k=0;k<m;k++){a=ab+(k-(m-1)/2)*sp;pos[l[k]]={x:0.86*Math.cos(a),y:0.86*Math.sin(a),a:a}}}}
+  else{for(i=0;i<N;i++){a=2*Math.PI*i/N-Math.PI/2;pos[i]={x:0.84*Math.cos(a),y:0.84*Math.sin(a),a:a}}}}
+function draw(){
+  var c=cols(),d=fit(cv),W=cv.width,H=cv.height,S=Math.min(W,H)/2*0.94,x0=W/2,y0=H/2,N=sim.N,top=sim.p.topology,r0=Math.max(2.5,11-N/12)*d,i;
+  function P(j){return[x0+pos[j].x*S,y0+pos[j].y*S]}
+  ctx.clearRect(0,0,W,H);ctx.lineWidth=d;
+  for(i=0;i<N;i++){var p=P(i),tx=x0,ty=y0;
+    if(top==='Hierarchical'&&sim.broker[i]>=0){var q=P(sim.broker[i]);tx=q[0];ty=q[1]}
+    ctx.globalAlpha=sim.alive[i]?(top==='Ring'?0.12:0.28):0.14;ctx.strokeStyle=sim.alive[i]?c.muted:c.bad;
+    ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(tx,ty);ctx.stroke();
+    if(top==='Ring'){var q2=P((i+1)%N);ctx.globalAlpha=0.4;ctx.strokeStyle=c.muted;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q2[0],q2[1]);ctx.stroke()}}
+  for(i=0;i<N;i++){var p2=P(i);
+    if(!sim.alive[i]){ctx.globalAlpha=0.95;ctx.strokeStyle=c.bad;ctx.lineWidth=2*d;var e=r0*0.8;ctx.beginPath();ctx.moveTo(p2[0]-e,p2[1]-e);ctx.lineTo(p2[0]+e,p2[1]+e);ctx.moveTo(p2[0]+e,p2[1]-e);ctx.lineTo(p2[0]-e,p2[1]+e);ctx.stroke();ctx.lineWidth=d;continue}
+    var t=Math.max(0,Math.min(1,(sim.trust[i]-0.5)/0.5));
+    ctx.globalAlpha=0.35+0.65*t;ctx.fillStyle=c.blue;ctx.beginPath();ctx.arc(p2[0],p2[1],r0*(0.7+0.6*sim.trueP[i]),0,6.2832);ctx.fill()}
+  ctx.globalAlpha=1;ctx.fillStyle=c.ink;ctx.beginPath();ctx.arc(x0,y0,0.075*S,0,6.2832);ctx.fill();
+  ctx.fillStyle=c.paper;ctx.font='600 '+(10*d)+'px '+c.font;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ORC',x0,y0);
+  if(sim.p.monitor){var mx=W-22*d,my=22*d;ctx.fillStyle=sim.anom>0.2?c.bad:c.muted;ctx.fillRect(mx-8*d,my-8*d,16*d,16*d);ctx.fillStyle=c.muted;ctx.font=(11*d)+'px '+c.font;ctx.textAlign='right';ctx.fillText('monitor',mx-14*d,my)}
+  readout();chart(c);
+}
+function readout(){
+  $('r_tick').textContent=sim.tick;$('r_alive').textContent=sim.nAlive;
+  $('r_comp').textContent=sim.comp.toFixed(3);$('r_iai').textContent=sim.iai.toFixed(3);$('r_tcd').textContent=sim.tcd.toFixed(3);
+  $('r_oer').textContent=sim.oer.toFixed(3);$('r_gini').textContent=sim.gini.toFixed(3);
+  $('r_cfp').textContent=Math.round(100*sim.casc/sim.N)+'%';$('r_done').textContent=(sim.done/sim.N).toFixed(1);
+  var ph=$('phase'),dead=sim.nAlive===0;
+  ph.textContent=sim.phase===2?(dead?'CRITICAL: all workers dead':'CRITICAL'):(sim.phase===1?'WARNING':'STABLE');
+  ph.className='phase'+(sim.phase===2?' c':(sim.phase===1?' w':''));
+}
+function chart(c){
+  var d=fit(ch),W=ch.width,H=ch.height,L=34*d,R=8*d,T=18*d,B=22*d,w=W-L-R,h=H-T-B,i;
+  cx2.clearRect(0,0,W,H);cx2.font=(11*d)+'px '+c.font;cx2.lineWidth=d;
+  function X(t){return L+w*t/200}function Y(v){return T+h*(1-v)}
+  cx2.strokeStyle=c.rule;cx2.fillStyle=c.muted;cx2.textAlign='right';cx2.textBaseline='middle';
+  [0,0.5,1].forEach(function(v){cx2.beginPath();cx2.moveTo(L,Y(v));cx2.lineTo(W-R,Y(v));cx2.stroke();cx2.fillText(v.toString(),L-6*d,Y(v))});
+  cx2.textAlign='center';cx2.textBaseline='top';[0,100,200].forEach(function(t){cx2.fillText(t,X(t),H-B+5*d)});
+  cx2.setLineDash([4*d,4*d]);cx2.strokeStyle=c.muted;cx2.beginPath();cx2.moveTo(L,Y(0.28));cx2.lineTo(W-R,Y(0.28));cx2.stroke();cx2.setLineDash([]);
+  cx2.textAlign='right';cx2.textBaseline='bottom';cx2.fillText('WARNING 0.28',W-R,Y(0.28)-2*d);
+  var S=[[0,c.blue,2.2],[1,c.ink,1.5],[2,c.muted,1.5]],H2=sim.hist;
+  S.forEach(function(s){cx2.strokeStyle=s[1];cx2.lineWidth=s[2]*d;cx2.beginPath();
+    for(i=0;i<H2.length;i++){var x=X(i+1),y=Y(H2[i][s[0]]);if(i===0)cx2.moveTo(x,y);else cx2.lineTo(x,y)}cx2.stroke()});
+  cx2.lineWidth=d;cx2.textAlign='left';cx2.textBaseline='top';var lx=L+8*d;
+  [['composite',c.blue],['info asymmetry',c.ink],['workers alive',c.muted]].forEach(function(l){cx2.fillStyle=l[1];cx2.fillRect(lx,4*d,10*d,3*d);cx2.fillStyle=c.muted;cx2.fillText(l[0],lx+14*d,1*d);lx+=cx2.measureText(l[0]).width+34*d});
+}
+function status(t){$('status').textContent=t}
+function rebuild(){sim=new MesaSim(params());layout();setPlaying(false);status('');draw()}
+function setPlaying(v){state.playing=v;$('play').textContent=v?'Pause':'Play';if(v){state.last=performance.now();state.acc=0;requestAnimationFrame(frame)}}
+function frame(ts){
+  if(!state.playing)return;
+  state.acc+=Math.min((ts-state.last)/1000,0.25)*(+els.speed.value);state.last=ts;
+  var n=0;while(state.acc>=1&&!sim.finished&&n<30){sim.step();state.acc-=1;n++}
+  draw();if(sim.finished)finish();else requestAnimationFrame(frame);
+}
+function finish(){
+  setPlaying(false);
+  var dead=sim.nAlive===0;
+  status(dead?'Run ended at tick '+sim.tick+': every worker is dead. First WARNING at tick '+(sim.firstWarn<0?'never':sim.firstWarn)+'.':
+    'Run ended after '+sim.tick+' ticks with '+sim.nAlive+' of '+sim.N+' workers alive and a composite score of '+sim.comp.toFixed(3)+'.');
+}
+function live(){var p=sim.p;p.scarcity=+els.scarcity.value;p.threshold=+els.thr.value;p.bias=els.bias.checked;p.monitor=els.mon.checked;draw()}
+els.scarcity.oninput=function(){$('o_scarcity').textContent=(+this.value).toFixed(2);live()};
+els.thr.oninput=function(){$('o_thr').textContent=(+this.value).toFixed(2);live()};
+els.speed.oninput=function(){$('o_speed').textContent=this.value+' ticks/s'};
+els.bias.onchange=live;els.mon.onchange=live;
+els.N.oninput=function(){$('o_N').textContent=this.value;rebuild()};
+els.topology.onchange=rebuild;
+$('play').onclick=function(){if(sim.finished)rebuild();setPlaying(!state.playing)};
+$('step').onclick=function(){setPlaying(false);if(sim.finished)rebuild();sim.step();draw();if(sim.finished)finish()};
+$('reset').onclick=rebuild;
+var PRE={calm:[0.3,'Star'],drift:[0.8,'Star'],edgeStar:[0.95,'Star'],edgeHier:[0.95,'Hierarchical']};
+[].forEach.call(document.querySelectorAll('[data-p]'),function(b){b.onclick=function(){var p=PRE[b.getAttribute('data-p')];
+  els.scarcity.value=p[0];$('o_scarcity').textContent=p[0].toFixed(2);els.topology.value=p[1];rebuild();setPlaying(true)}});
+window.addEventListener('resize',function(){draw()});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){draw()})}catch(e){}
+rebuild();
+})();
+</script>
+</body>
+</html>

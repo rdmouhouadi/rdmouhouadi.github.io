@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forecasting a whole oilfield with a graph neural network | Richie Mouhouadi</title>
+<meta name="description" content="A graph neural network and LSTM trained on the public Volve oilfield: good history match, but physically inconsistent what-if responses.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.meta:has(+.journey){margin-bottom:10px}
+.journey{color:var(--muted);margin:0 0 32px;font-size:15px}
+.journey b{color:var(--ink);font-weight:600}
+.journey i{font-style:normal}
+@media (max-width:760px){.journey span{display:block;margin-bottom:2px}.journey i{display:none}}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+/* consistent link hover */
+@media (hover:hover){a:hover{color:var(--blue)}}
+</style>
+</head>
+<body>
+<!-- REVIEW before publishing: check that nothing confidential remains. -->
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="../#work">&larr; Back to work</a>
+</header>
+
+<main>
+  <h1>Forecasting a whole oilfield with a graph neural network</h1>
+  <p class="meta">Beicip-Franlab &middot; Reservoir engineer intern &middot; 2024</p>
+  <p class="journey"><span><b>New to me:</b> graph neural networks</span><i aria-hidden="true"> &middot; </i><span><b>First result:</b> 2&ndash;3 weeks</span><i aria-hidden="true"> &middot; </i><span><b>Whole study:</b> 2 months, a history match and what-if tests on 7 wells</span></p>
+  <p class="lede">I built a graph neural network and LSTM model that treats an oilfield as a network of wells, and tested it on the public Volve field. It matched the field&#8217;s history for pressure and water cut, but its responses to controlled changes in injection and production were not physically consistent.</p>
+  <dl class="brief">
+    <div><dt>Data</dt><dd>Volve field, 7 wells: 5 producers, 2 injectors</dd></div>
+    <div><dt>Model</dt><dd>Graph convolution + LSTM</dd></div>
+    <div><dt>Targets</dt><dd>Bottom-hole pressure, water cut</dd></div>
+    <div><dt>Outcome</dt><dd>History match: yes. What-if: no</dd></div>
+  </dl>
+  <nav class="toc" aria-label="On this page"><a href="#context">Context</a><a href="#problem">Problem</a><a href="#method">Methodology</a><a href="#results">Results</a><a href="#takeaway">Takeaway</a><a href="#refs">References</a></nav>
+
+  <section id="context">
+    <h2>Context</h2>
+    <div class="body"><p>Reservoir simulators predict how a field will produce, but running a numerical model takes time. Consultants work under strict deadlines, so data-driven alternatives are attractive. I tested one on the Volve oilfield in the Norwegian North Sea, whose data is publicly available. The field was discovered in 1993 and produced for eight years from 2008. Of the 16 wells drilled, including producers, water injectors and one gas injector, I used seven: five producers (F1C, F11, F12, F14, F15D) and two water injectors (F4, F5).</p></div>
+  </section>
+
+  <section id="problem">
+    <h2>Problem</h2>
+    <div class="body"><p>Machine-learning work on production forecasting has focused on one well at a time [1&ndash;4]. Yet wells in a field interact: injecting water in one place changes pressure and production somewhere else. The goal here was a kind of digital twin of the whole field, using a graph neural network (GNN) [5, 9] to capture local and field-level interactions between wells, and an LSTM [6] to capture how each measurement evolves in time.</p><p>Combining the two is established in other domains. Pan et al. [7], for instance, use a graph convolution for the spatial structure and an LSTM for temporal behaviour in network traffic.</p><p><b>Research question:</b> can a graph convolution plus LSTM model learn both the history of a field and the relationships between its wells?</p></div>
+  </section>
+
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="body"><h3>Data and graph</h3><p>Each well is a node carrying its production history: produced volumes of oil, water and liquid, and pressure. The links between nodes come from the distances between wells (Table 1), which define the adjacency matrix.</p><figure class="fig"><div class="frame"><img src="images/gnn-graph.jpg" width="1000" height="378" loading="lazy" alt="Map of the Volve wells next to the graph built from them, with producers in green and injectors in blue."></div><figcaption><b>Figure 1.</b> From field to graph. Wells become nodes (producers in green, injectors in blue) and distances between wells define the links.</figcaption></figure><div class="tbl"><table><caption><b>Table 1.</b> Distances between wells, used to build the graph&#8217;s adjacency matrix.</caption><thead><tr><th></th><th>F1C</th><th>F11</th><th>F12</th><th>F14</th><th>F4</th><th>F5</th></tr></thead><tbody><tr><td><b>F1C</b></td><td>0.00</td><td>1269.99</td><td>1113.19</td><td>1368.03</td><td>969.52</td><td>1008.37</td></tr><tr><td><b>F11</b></td><td>1269.99</td><td>0.00</td><td>161.55</td><td>110.57</td><td>305.35</td><td>269.74</td></tr><tr><td><b>F12</b></td><td>1113.19</td><td>161.55</td><td>0.00</td><td>255.31</td><td>145.02</td><td>108.25</td></tr><tr><td><b>F14</b></td><td>1368.03</td><td>110.57</td><td>255.31</td><td>0.00</td><td>399.63</td><td>360.62</td></tr><tr><td><b>F4</b></td><td>969.52</td><td>305.35</td><td>145.02</td><td>399.63</td><td>0.00</td><td>43.14</td></tr><tr><td><b>F5</b></td><td>1008.37</td><td>269.74</td><td>108.25</td><td>360.62</td><td>43.14</td><td>0.00</td></tr></tbody></table></div><h3>Model</h3><p>The model adapts a published traffic-forecasting architecture that combines a graph convolution with an LSTM [8]. I modified it so that each node carries several attributes instead of one. The graph passes through graph convolution layers with ReLU activations, which let each well learn from its own data and its neighbours&#8217;. The output feeds the LSTM, which learns temporal correlations for each attribute and each node.</p><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 170" role="img" aria-label="Pipeline: oilfield to graph, graph convolution for spatial interaction, LSTM for time, forecast per well.">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="b" x="2" y="30" width="120" height="70" rx="6"/><text x="62" y="60" text-anchor="middle">Oilfield</text><text x="62" y="78" text-anchor="middle" class="m">7 wells</text>
+<path class="a" d="M122 65H148" marker-end="url(#ah)"/>
+<rect class="b" x="150" y="30" width="120" height="70" rx="6"/><text x="210" y="60" text-anchor="middle">Graph</text><text x="210" y="78" text-anchor="middle" class="m">wells = nodes</text>
+<path class="a" d="M270 65H296" marker-end="url(#ah)"/>
+<rect class="g" x="298" y="30" width="120" height="70" rx="6"/><text x="358" y="60" text-anchor="middle">Graph conv.</text><text x="358" y="78" text-anchor="middle" class="m">space: neighbours</text>
+<path class="a" d="M418 65H444" marker-end="url(#ah)"/>
+<rect class="g" x="446" y="30" width="120" height="70" rx="6"/><text x="506" y="60" text-anchor="middle">LSTM</text><text x="506" y="78" text-anchor="middle" class="m">time: history</text>
+<path class="a" d="M566 65H592" marker-end="url(#ah)"/>
+<rect class="b" x="594" y="30" width="124" height="70" rx="6"/><text x="656" y="60" text-anchor="middle">Forecast</text><text x="656" y="78" text-anchor="middle" class="m">pressure, water cut</text>
+<text x="210" y="124" text-anchor="middle" class="m">features: oil, water, liquid, pressure</text><text x="210" y="142" text-anchor="middle" class="m">links: distance between wells</text>
+</svg></div><figcaption><b>Figure 2.</b> Model pipeline. The graph convolution captures how wells influence their neighbours, and the LSTM captures how each well evolves over time.</figcaption></figure><h3>Evaluation</h3><p>Two questions were tested. A <b>history match</b> checks whether the model reproduces what really happened, in two scenarios (Table 2). A <b>what-if</b> test checks whether the model captures relationships between wells: I scaled water injection and liquid production up or down and examined how the predicted pressure and water cut responded (Table 3).</p><div class="tbl"><table><caption><b>Table 2.</b> Evaluation scenarios.</caption><thead><tr><th>Scenario</th><th>Target</th><th>Inputs</th></tr></thead><tbody><tr><td>1</td><td>Bottom-hole pressure (BHP) of well F14</td><td>Liquid produced by the five producers, water injected in F4 and F5</td></tr><tr><td>2</td><td>Water cut of the five producers</td><td>Liquid produced by the five producers, water injected in F4 and F5</td></tr></tbody></table></div><div class="tbl"><table><caption><b>Table 3.</b> What-if tests. Each scenario has three tests with three cases (a, b, c), applied to the history of the inputs.</caption><thead><tr><th>Test</th><th>Change</th><th>Case a</th><th>Case b</th><th>Case c</th></tr></thead><tbody><tr><td>1</td><td>Water injection (F4, F5)</td><td>&times;0.5 on both</td><td>&times;0.75 on both</td><td>F4 &times;0, F5 &times;1</td></tr><tr><td>2</td><td>Liquid production (producers)</td><td>&times;0.5 on all</td><td>&times;0.75 on all</td><td>&times;2 on all</td></tr><tr><td>3</td><td>Both together</td><td>&times;0.5 on all*</td><td>&times;0.75 on all</td><td>injection as in test 1, production &times;2</td></tr></tbody></table></div><p class="eqn">* In scenario 2, test 3, case a uses &times;0.2 on F1C and F11.</p><h3>Implementation</h3><p>Python, with <span class="todo">[Keras or PyTorch: confirm. The model adapts a Keras example.]</span></p></div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <div class="body"><h3>History match</h3><p>The model reproduced the history in both scenarios, including the abrupt drops in the signals.</p><figure class="fig"><div class="frame"><img src="images/gnn-history-pressure.jpg" width="1000" height="651" loading="lazy" alt="Predicted and measured bottom-hole pressure of well F14 over time, with a zoom on two sharp drops."></div><figcaption><b>Figure 3.</b> Scenario 1: history match of the bottom-hole pressure of F14, with a zoom on two abrupt drops. Prediction in red, measurement in blue.</figcaption></figure><figure class="fig"><div class="frame"><img src="images/gnn-history-watercut.jpg" width="1000" height="728" loading="lazy" alt="Predicted and measured water cut for the five producers over time."></div><figcaption><b>Figure 4.</b> Scenario 2: history match of the water cut of the five producers.</figcaption></figure><h3>What-if tests</h3><p>When the inputs were modified, the model did respond: predicted pressure and water cut changed. But the responses make little physical sense. In the zoomed views, the curves for the three cases stay close to each other and below the measured curve, instead of separating according to the size of the change I applied.</p><figure class="fig"><div class="frame"><img src="images/gnn-whatif-pressure.jpg" width="933" height="474" loading="lazy" alt="Measured and predicted pressure for the base prediction and three cases, with a zoom."></div><figcaption><b>Figure 5.</b> Scenario 1, test 1: predicted pressure for the three water-injection cases, with a zoom. Measurement in blue.</figcaption></figure><figure class="fig"><div class="frame"><img src="images/gnn-whatif-watercut.jpg" width="1000" height="497" loading="lazy" alt="Measured and predicted water cut for the base prediction and three cases, with a zoom."></div><figcaption><b>Figure 6.</b> Scenario 2, test 1: predicted water cut for the three water-injection cases, with a zoom.</figcaption></figure><p>This is the key finding. The complexity of the physics governing production explains the poor result: the relationships between each measurement and the interactions between wells, through fluid flow and permeability, were not learned from the data alone.</p></div>
+  </section>
+
+  <section id="takeaway">
+    <h2>Takeaway</h2>
+    <div class="body"><p>A model that fits history is not necessarily a model that understands the field. The what-if test exposed that gap, and it is the test that matters for a digital twin. The graph used only distances, so permeability and fluid flow were invisible to the model.</p>
+<h3>Limitations</h3><ul><li>Links between wells reflect distance only.</li><li>Seven wells from a single field.</li><li>No comparison yet against a reservoir numerical simulator, which would give ground truth for the what-if tests.</li><li>Further training and testing are needed before the predictions are usable.</li></ul>
+<h3>Future improvements</h3><ul><li>Put weights on the edges of the graph.</li><li>Stack several adjacency matrices built from permeability distributions and fluid flow.</li><li>Validate the model against a reservoir numerical simulator.</li></ul></div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <div class="body"><ol class="refs">
+<li>Bikmukhametov, T. and J&auml;schke, J., 2019. Oil production monitoring using gradient boosting machine learning algorithm. <i>IFAC-PapersOnLine</i>, 52, 514&ndash;519.</li>
+<li>Liu, W., Liu, W.D. and Gu, J., 2019. Petroleum production forecasting based on machine learning. <i>Proceedings of the 3rd International Conference on Advances in Image Processing</i>, 124&ndash;128.</li>
+<li>Ning, Y., Kazemi, H. and Tahmasebi, P., 2022. A comparative machine learning study for time series oil production forecasting: ARIMA, LSTM, and Prophet. <i>Computers &amp; Geosciences</i>, 164, 105126.</li>
+<li>Liu, W., Chen, Z., Hu, Y. and Xu, L., 2023. A systematic machine learning method for reservoir identification and production prediction. <i>Petroleum Science</i>, 20(1), 295&ndash;308.</li>
+<li>Zhou, J., Cui, G., Hu, S., Zhang, Z., Yang, C., Liu, Z., Wang, L., Li, C. and Sun, M., 2020. Graph neural networks: a review of methods and applications. <i>AI Open</i>, 1, 57&ndash;81.</li>
+<li>Van Houdt, G., Mosquera, C. and N&aacute;poles, G., 2020. A review on the long short-term memory model. <i>Artificial Intelligence Review</i>, 53(8), 5929&ndash;5955.</li>
+<li>Pan, Y., Zhang, X., Jiang, H. and Li, G., 2021. A network traffic classification method based on graph convolution and LSTM. <i>IEEE Access</i>, 9, 158261&ndash;158272.</li>
+<li>Keras documentation. Traffic forecasting using graph neural networks and LSTM. keras.io/examples/timeseries/timeseries_traffic_forecasting.</li>
+<li>Sanchez-Lengeling, B., Reif, E., Pearce, A. and Wiltschko, A.B., 2021. A gentle introduction to graph neural networks. <i>Distill</i>. doi:10.23915/distill.00033.</li></ol></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a href="../#work">&larr; Back to work</a>
+  <p>Details are generalized to respect confidentiality. The code stays inside the company.</p>
+</footer>
+</div>
+</body>
+</html>

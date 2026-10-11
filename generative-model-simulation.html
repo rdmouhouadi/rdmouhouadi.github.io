@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can a GAN stand in for a slow geological simulation? | Richie Mouhouadi</title>
+<meta name="description" content="Testing a generative adversarial network as a fast stand-in for stratigraphic simulations, trained on 45 simulation runs.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.meta:has(+.journey){margin-bottom:10px}
+.journey{color:var(--muted);margin:0 0 32px;font-size:15px}
+.journey b{color:var(--ink);font-weight:600}
+.journey i{font-style:normal}
+@media (max-width:760px){.journey span{display:block;margin-bottom:2px}.journey i{display:none}}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+/* consistent link hover */
+@media (hover:hover){a:hover{color:var(--blue)}}
+</style>
+</head>
+<body>
+<!-- REVIEW before publishing: check that nothing confidential remains. -->
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="../#work">&larr; Back to work</a>
+</header>
+
+<main>
+  <h1>Can a GAN stand in for a slow geological simulation?</h1>
+  <p class="meta">Beicip-Franlab &middot; Reservoir engineer intern &middot; 2024</p>
+  <p class="journey"><span><b>New to me:</b> GANs</span><i aria-hidden="true"> &middot; </i><span><b>First result:</b> 2&ndash;3 weeks</span><i aria-hidden="true"> &middot; </i><span><b>Whole study:</b> 2 months, 5 training trials, compared against 2 baselines</span></p>
+  <p class="lede">I tested whether a generative adversarial network (GAN) could act as a fast proxy for stratigraphic forward simulations, producing reservoir thickness maps from four uncertain parameters. It reproduced the geometry of the sediment bodies, but with higher pixel-level error than a response surface and a neural network, mainly because of the very small training set.</p>
+  <dl class="brief">
+    <div><dt>Data</dt><dd>45 simulation runs, 36 to train and 9 to test</dd></div>
+    <div><dt>Model</dt><dd>GAN with a dense generator and a CNN discriminator</dd></div>
+    <div><dt>Output</dt><dd>69 × 89 reservoir thickness map</dd></div>
+    <div><dt>Outcome</dt><dd>Right shapes, higher error than the baselines</dd></div>
+  </dl>
+  <nav class="toc" aria-label="On this page"><a href="#context">Context</a><a href="#problem">Problem</a><a href="#method">Methodology</a><a href="#results">Results</a><a href="#takeaway">Takeaway</a><a href="#refs">References</a></nav>
+
+  <section id="context">
+    <h2>Context</h2>
+    <div class="body"><p>Forward stratigraphic modeling (FSM) simulates how a sedimentary basin fills through time [1]. It is used, for example, to anticipate where reservoir rock is distributed in carbonate platforms [2]. FSM is deterministic: one set of input parameters gives one outcome, and confidence in the result depends on how many calibration points constrain it.</p>
+<p>In practice, several inputs are uncertain: geological concepts, numerical assumptions and parameter values. In this study, a carbonate platform in the Middle East was simulated with four uncertain parameters: sea level, paleobathymetry, and carbonate production as a function of time and of depth. The output of interest is a map of reservoir thickness.</p></div>
+  </section>
+
+  <section id="problem">
+    <h2>Problem</h2>
+    <div class="body"><p>Uncertainty is usually handled by running the simulator many times. In a consulting setting, each option has a weakness:</p>
+<ul><li><b>Reference model with best and worst cases:</b> quick, but too simple to represent the range of outcomes.</li><li><b>Monte Carlo sampling:</b> thorough, but too slow, since every FSM run is expensive.</li><li><b>Proxy models:</b> a fast surrogate trained on a limited set of simulations.</li></ul>
+<p>The company&#8217;s tool relies on the response surface (RS) method. An internal comparison in 2023 found that RS was still slightly better than a fully connected neural network (NN), but the two were close. That suggested a more expressive model might surpass RS.</p>
+<p><b>Research question:</b> can a generative adversarial network (GAN) [3], which has already been used to generate realistic facies models [4], produce accurate thickness maps from the four uncertain parameters?</p></div>
+  </section>
+
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="body"><h3>Data</h3><p>Each simulation run combines one value of each of the four uncertain parameters, chosen by an experimental design. The dataset holds 45 runs: 36 for training and 9 for confirmation (testing). Each run&#8217;s thickness map is rasterized as a 69&#8239;×&#8239;89 single-channel image. Because 36 images is very little, I also tested data augmentation, which raised the training set above 1,500 samples in some experiments.</p><h3>Architecture</h3><p>The GAN follows the standard two-network design [3]. The generator maps the four parameter values, with noise, to a 69&#8239;×&#8239;89 map through stacked fully connected blocks (Dense, LeakyReLU, batch normalization) and a final reshape. The discriminator is a convolutional classifier: three Conv2D and LeakyReLU stages, then Flatten and a Dense layer that outputs real or fake.</p><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 220" role="img" aria-label="GAN training setup: the generator turns four parameters and noise into a map, the discriminator compares it with a real simulated map, and each network learns from the other.">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="b" x="6" y="85" width="124" height="50" rx="6"/><text x="68" y="107" text-anchor="middle">4 parameters</text><text x="68" y="124" text-anchor="middle">+ noise</text>
+<path class="a" d="M130 110H188" marker-end="url(#ah)"/>
+<rect class="g" x="190" y="75" width="120" height="70" rx="6"/><text x="250" y="115" text-anchor="middle">Generator</text>
+<path class="a" d="M310 110H378" marker-end="url(#ah)"/>
+<rect class="b" x="380" y="85" width="100" height="50" rx="6"/><text x="430" y="107" text-anchor="middle">Generated</text><text x="430" y="124" text-anchor="middle">map 69×89</text>
+<rect class="b" x="380" y="10" width="100" height="50" rx="6"/><text x="430" y="32" text-anchor="middle">Real map</text><text x="430" y="49" text-anchor="middle">69×89</text>
+<path class="a" d="M480 35H530V88H556" marker-end="url(#ah)"/><path class="a" d="M480 110H530V122H556" marker-end="url(#ah)"/>
+<rect class="g" x="560" y="75" width="140" height="70" rx="6"/><text x="630" y="107" text-anchor="middle">Discriminator</text><text x="630" y="125" text-anchor="middle" class="m">real or fake?</text>
+<path class="a dash" d="M630 145V200H250V148" marker-end="url(#ah)"/><text x="440" y="192" text-anchor="middle" class="m">each network learns from the other&#8217;s result</text>
+</svg></div><figcaption><b>Figure 1.</b> GAN training setup. The generator turns the four uncertain parameters and noise into a thickness map, and the discriminator tries to tell it from a real simulated map.</figcaption></figure><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 700 270" role="img" aria-label="Layer stacks of the generator and the discriminator.">
+<defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<text x="0" y="16" class="h">Generator</text>
+<rect class="b" x="0" y="30" width="110" height="56" rx="6"/><text x="55" y="55" text-anchor="middle">Input</text><text x="55" y="72" text-anchor="middle" class="m">4 values + noise</text>
+<path class="a" d="M110 58H136" marker-end="url(#ah2)"/>
+<rect class="g" x="138" y="30" width="210" height="56" rx="6"/><text x="243" y="55" text-anchor="middle">Dense · LeakyReLU</text><text x="243" y="72" text-anchor="middle" class="m">· BatchNorm, repeated blocks</text>
+<path class="a" d="M348 58H374" marker-end="url(#ah2)"/>
+<rect class="g" x="376" y="30" width="90" height="56" rx="6"/><text x="421" y="63" text-anchor="middle">Dense</text>
+<path class="a" d="M466 58H492" marker-end="url(#ah2)"/>
+<rect class="b" x="494" y="30" width="150" height="56" rx="6"/><text x="569" y="55" text-anchor="middle">Reshape</text><text x="569" y="72" text-anchor="middle" class="m">map 69×89×1</text>
+<text x="0" y="132" class="h">Discriminator</text>
+<rect class="b" x="0" y="190" width="100" height="56" rx="6"/><text x="50" y="215" text-anchor="middle">Input</text><text x="50" y="232" text-anchor="middle" class="m">69×89×1</text>
+<path class="a" d="M100 218H124" marker-end="url(#ah2)"/>
+<rect class="g" x="126" y="150" width="96" height="136" rx="6" transform="translate(0,-26)"/><text x="174" y="214" text-anchor="middle">Conv2D</text><text x="174" y="231" text-anchor="middle" class="m">LeakyReLU</text>
+<path class="a" d="M222 218H246" marker-end="url(#ah2)"/>
+<rect class="g" x="248" y="168" width="96" height="100" rx="6" transform="translate(0,-18)"/><text x="296" y="214" text-anchor="middle">Conv2D</text><text x="296" y="231" text-anchor="middle" class="m">LeakyReLU</text>
+<path class="a" d="M344 218H368" marker-end="url(#ah2)"/>
+<rect class="g" x="370" y="186" width="96" height="64" rx="6" transform="translate(0,-4)"/><text x="418" y="214" text-anchor="middle">Conv2D</text><text x="418" y="231" text-anchor="middle" class="m">LeakyReLU</text>
+<path class="a" d="M466 218H490" marker-end="url(#ah2)"/>
+<rect class="b" x="492" y="190" width="80" height="56" rx="6"/><text x="532" y="223" text-anchor="middle">Flatten</text>
+<path class="a" d="M572 218H596" marker-end="url(#ah2)"/>
+<rect class="g" x="598" y="190" width="100" height="56" rx="6"/><text x="648" y="215" text-anchor="middle">Dense</text><text x="648" y="232" text-anchor="middle" class="m">real / fake</text>
+</svg></div><figcaption><b>Figure 2.</b> Layer stacks. The generator is a fully connected network that ends in a reshape to the map size. The discriminator is a small convolutional classifier with three Conv2D stages.</figcaption></figure><p class="eq">min<sub>G</sub> max<sub>D</sub> &#120124;[log D(x)] + &#120124;[log(1 &minus; D(G(z)))]</p><p class="eqn">The standard adversarial objective, where x is a real simulated map and z is the generator&#8217;s input.</p><h3>Training</h3><p>Training alternates between the two networks: the discriminator learns to separate real from generated maps, then the generator is updated to fool it. I iterated on image size, dataset, number of epochs and the range of the random inputs. Table 1 summarizes the trials and Figure 3 shows their outputs.</p><div class="tbl"><table><caption><b>Table 1.</b> Training trials.</caption><thead><tr><th>Trial</th><th>Image size</th><th>Training images</th><th>Epochs</th><th>Time</th><th>Note</th></tr></thead><tbody><tr><td>1</td><td>28×28×3</td><td>36</td><td>30,000</td><td>120 min</td><td>First attempt</td></tr><tr><td>2</td><td>64×64×3</td><td>36</td><td>8,500</td><td>95 min</td><td></td></tr><tr><td>3</td><td>64×64×3</td><td>113</td><td>6,000</td><td>39 min</td><td>Two datasets combined</td></tr><tr><td>4</td><td>64×64×3</td><td>113</td><td>6,500</td><td>46 min</td><td>Inputs constrained to [−1, 1]</td></tr><tr><td>5</td><td>69×89×1</td><td>130</td><td>500</td><td>16 min</td><td>Final: native map size</td></tr></tbody></table></div><figure class="fig"><div class="frame"><img src="images/gan-progression.jpg" width="1000" height="758" loading="lazy" alt="Real thickness map next to the outputs of the five training trials, from a coarse 28 by 28 colour image to a 69 by 89 map."></div><figcaption><b>Figure 3.</b> The real map (left) and the outputs of trials 1 to 5. Quality improves as the setup moves from coarse colour images to the native 69&#8239;×&#8239;89 single-channel format.</figcaption></figure><h3>Evaluation</h3><p>Evaluation used the nine held-out runs, in four ways: a visual comparison of real and generated maps; the sum of pixel values, which should match if total thickness is preserved; pixel-wise error and absolute error maps; and the error sum per confirmation run, compared against the RS and NN proxies.</p><h3>Implementation</h3><p>Python, with <span class="todo">[Keras/TensorFlow or PyTorch: confirm]</span>. Training time on <span class="todo">[hardware: confirm]</span> ranged from 16 minutes (final setup) to 2 hours (first trial).</p></div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <div class="body"><p>The GAN reproduces the main geometry in all nine test runs: the elongated body, its high-thickness zone at the top, and the lobes along its length. The generated maps are visibly noisier and blurrier than the references.</p><figure class="fig"><div class="frame"><img src="images/gan-test-set.jpg" width="862" height="846" loading="lazy" alt="Nine real simulated thickness maps above the nine maps generated by the GAN."></div><figcaption><b>Figure 4.</b> Held-out runs: real simulated maps (top rows) and GAN outputs (bottom rows).</figcaption></figure><p>Summing pixel values tests whether total thickness is preserved. Points would fall on the diagonal if it were. They scatter on both sides, with individual runs over- or underestimated by up to roughly 12 percent, and no consistent bias.</p><figure class="fig"><div class="frame"><img src="images/gan-pixel-sums.png" width="902" height="512" loading="lazy" alt="Scatter plot of the pixel sum of generated images against real images, with a diagonal ideal line."></div><figcaption><b>Figure 5.</b> Sum of pixel values, real versus generated, for the nine test pairs. The dashed line is the ideal case.</figcaption></figure><p>Error maps show where the differences sit. Absolute error concentrates along the edges of the sediment body and around its high-thickness zone, and the signed error shows both over- and underestimation.</p><figure class="fig"><div class="frame"><img src="images/gan-error-maps.jpg" width="901" height="884" loading="lazy" alt="Absolute error maps and signed error maps for each of the nine pairs."></div><figcaption><b>Figure 6.</b> (a) Absolute error and (b) signed error between real and generated maps, per pair.</figcaption></figure><p>Against the baselines, the answer is clear. On the nine confirmation runs, the GAN has a higher error sum than both RS and NN in most runs, and several times higher in the worst ones. It has the lowest error in only one or two runs.</p><figure class="fig"><div class="frame"><img src="images/gan-error-comparison.png" width="808" height="539" loading="lazy" alt="Bar chart of the error sum for the response surface, the neural network and the GAN on nine confirmation simulations."></div><figcaption><b>Figure 7.</b> Error sum on the nine confirmation simulations for RS, NN and the GAN.</figcaption></figure><p>So in this setting, a GAN does not beat simpler proxies.</p></div>
+  </section>
+
+  <section id="takeaway">
+    <h2>Takeaway</h2>
+    <div class="body"><p>GANs are unstable and data-hungry. Published geoscience applications typically train on more than 10,000 images, against about 130 here. The small dataset left no room for deeper networks, and every attempt to add capacity drifted quickly into overfitting. The final model therefore captures geometry but not fine pixel-level detail.</p>
+<p>The practical lesson: when simulations are expensive and few, a simple proxy such as RS or a small neural network is the better first choice. A GAN becomes attractive once the dataset grows.</p>
+<h3>Limitations</h3><ul><li>Very small training set, built from 45 simulation runs.</li><li>Deeper networks overfitted quickly, which capped image quality.</li><li>Blurry output, with pixel-level accuracy below simpler methods.</li></ul>
+<h3>Future improvements</h3><ul><li>Generate more simulation runs to enlarge the training set.</li><li>Evaluate a combination of the GAN and the neural network.</li><li>Try a GAN combined with a variational autoencoder, which may give sharper images from under 150 training images.</li></ul></div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <div class="body"><ol class="refs"><li>Huang, X., Griffiths, C.M. and Liu, J., 2015. Recent development in stratigraphic forward modeling and its application in petroleum exploration. <i>Australian Journal of Earth Sciences</i>, 62(8), 903&ndash;919.</li>
+<li>Burgess, P.M., Lammers, H., van Oosterhout, C. and Granjeon, D., 2006. Multivariate sequence stratigraphy: tackling complexity and uncertainty with stratigraphic forward modeling, multiple scenarios, and conditional frequency maps. <i>AAPG Bulletin</i>, 90, 1883&ndash;1901.</li>
+<li>Goodfellow, I.J., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A. and Bengio, Y., 2014. Generative adversarial nets. <i>Advances in Neural Information Processing Systems 27</i>, 2672&ndash;2680.</li>
+<li>Zhang, T.F., Tilke, P., Dupont, E., Zhu, L.C., Liang, L. and Bailey, W., 2019. Generating geologically realistic 3D reservoir facies models using deep learning of sedimentary architecture with generative adversarial networks. <i>Petroleum Science</i>, 16, 541&ndash;549.</li></ol></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a href="../#work">&larr; Back to work</a>
+  <p>Details are generalized to respect confidentiality. The code stays inside the company.</p>
+</footer>
+</div>
+</body>
+</html>
