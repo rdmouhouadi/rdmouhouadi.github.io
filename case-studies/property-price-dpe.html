@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What is a home&#8217;s energy rating worth? | Richie Mouhouadi</title>
+<meta name="description" content="A property price model for France built on 4.2 million public sales and 15.7 million energy ratings. Median error 16% on 2025 sales; the energy rating cuts the error by 13%.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.meta:has(+.journey){margin-bottom:10px}
+.journey{color:var(--muted);margin:0 0 32px;font-size:15px}
+.journey b{color:var(--ink);font-weight:600}
+.journey i{font-style:normal}
+@media (max-width:760px){.journey span{display:block;margin-bottom:2px}.journey i{display:none}}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.dg .fb{fill:var(--blue)}
+.dg .fm{fill:var(--dash)}
+.dg .axis{stroke:var(--rule);stroke-width:1}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.best td{font-weight:600}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+/* consistent link hover */
+@media (hover:hover){a:hover{color:var(--blue)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="../#work">&larr; Back to work</a>
+</header>
+
+<main>
+  <h1>What is a home&#8217;s energy rating worth?</h1>
+  <p class="meta">Personal project &middot; Open data &middot; 2026 &middot; Part 1 of 2: the model</p>
+  <p class="journey"><span><b>New to me:</b> DuckDB, Polars, uv, ADEME&#8217;s remote database, and joining two datasets with no shared key</span><i aria-hidden="true"> &middot; </i><span><b>First result:</b> same day</span><i aria-hidden="true"> &middot; </i><span><b>Whole model:</b> one day; the MLOps half is part 2</span></p>
+  <p class="lede">I built a model that estimates the sale price of a French home from public data, and used it to measure what the energy rating (DPE) adds. On 2025 sales it never saw, half of its estimates fall within 16% of the real price. On identical sales, adding the energy rating cuts the median error by 13%.</p>
+  <dl class="brief">
+    <div><dt>Data</dt><dd>4.2M sales, 15.7M energy ratings</dd></div>
+    <div><dt>Model</dt><dd>LightGBM, 21 features</dd></div>
+    <div><dt>Target</dt><dd>Price per m&sup2;</dd></div>
+    <div><dt>Outcome</dt><dd>Median error 16% on 2025</dd></div>
+  </dl>
+  <nav class="toc" aria-label="On this page"><a href="#context">Context</a><a href="#problem">Problem</a><a href="#method">Methodology</a><a href="#results">Results</a><a href="#takeaway">Takeaway</a><a href="#refs">References</a></nav>
+
+  <section id="context">
+    <h2>Context</h2>
+    <div class="body"><p>France publishes every property sale: price, date, surface, address [1]. It also publishes every energy performance diagnosis (DPE) made since July 2021, the A-to-G rating a seller must show [2]. Buyers and sellers keep asking the same question: how much is a better rating worth?</p><p>The two datasets were never designed to work together. Sales records have no energy rating, and ratings have no sale price. There is no shared identifier between them.</p><p>The rating itself keeps changing. On 1 January 2026, the conversion coefficient for electricity in the DPE calculation dropped from 2.3 to 1.9 [4], and it drops again to 1.7 on 1 January 2027 [5]. The same home can get a different label without any work being done.</p></div>
+  </section>
+
+  <section id="problem">
+    <h2>Problem</h2>
+    <div class="body"><p>My first idea was forecasting household energy use from smart meters. I dropped it: the people who would use such a tool don&#8217;t have the meter data to feed it. A price estimate works because anyone knows their commune, surface and number of rooms.</p><p>Estimators already exist, and so does a dataset that links sales to energy ratings [3]. What I found no one covering is the rating rules themselves changing, as they did in January 2026 and will again in January 2027. A model trained on old labels then quietly misreads new ones. That became the long-term goal: a model that notices the change and retrains itself.</p><p>I wanted a tool people could actually use: enter what you know about a home and get an estimated price with an honest error. That rules out inputs nobody has, and it means testing on future sales, not on a random sample of the past.</p><p><b>Research question:</b> after joining the two public datasets, how accurately can a model estimate a sale price, and how much does the energy rating improve the estimate?</p></div>
+  </section>
+
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="body"><h3>Data</h3><p>Sales come from the geolocated DVF files for 2021 to 2025 [1]. One sale is spread over several rows, one per lot or plot, so I rebuilt one row per sale and kept ordinary sales of exactly one house or apartment. Outliers in price per m&sup2; were trimmed within each d&eacute;partement and property type. That left 4,245,617 sales.</p><p>Energy ratings come from ADEME&#8217;s database [2], a relational model of more than 150 tables published as a remote DuckDB file. I extracted the columns I needed into Parquet and flattened them to one row per rating: 15,672,018 ratings for existing houses and apartments.</p><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 190" role="img" aria-label="Pipeline: DVF sales and DPE ratings joined on address, then local market features, then LightGBM, then a price estimate.">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="b" x="2" y="10" width="120" height="66" rx="6"/><text x="62" y="39" text-anchor="middle">DVF sales</text><text x="62" y="57" text-anchor="middle" class="m">4.2M, 2021&ndash;2025</text>
+<rect class="b" x="2" y="114" width="120" height="66" rx="6"/><text x="62" y="143" text-anchor="middle">DPE ratings</text><text x="62" y="161" text-anchor="middle" class="m">15.7M</text>
+<path class="a" d="M122 43L160 80" marker-end="url(#ah)"/><path class="a" d="M122 147L160 110" marker-end="url(#ah)"/>
+<rect class="g" x="162" y="62" width="120" height="66" rx="6"/><text x="222" y="91" text-anchor="middle">Address join</text><text x="222" y="109" text-anchor="middle" class="m">605k matches</text>
+<path class="a" d="M282 95H312" marker-end="url(#ah)"/>
+<rect class="b" x="314" y="62" width="120" height="66" rx="6"/><text x="374" y="91" text-anchor="middle">Features</text><text x="374" y="109" text-anchor="middle" class="m">past local prices</text>
+<path class="a" d="M434 95H464" marker-end="url(#ah)"/>
+<rect class="g" x="466" y="62" width="120" height="66" rx="6"/><text x="526" y="91" text-anchor="middle">LightGBM</text><text x="526" y="109" text-anchor="middle" class="m">ln(price per m&sup2;)</text>
+<path class="a" d="M586 95H616" marker-end="url(#ah)"/>
+<rect class="b" x="618" y="62" width="100" height="66" rx="6"/><text x="668" y="91" text-anchor="middle">Estimate</text><text x="668" y="109" text-anchor="middle" class="m">price in &euro;</text>
+</svg></div><figcaption><b>Figure 1.</b> Pipeline. The join is what makes the energy rating usable as a feature; everything else follows from it.</figcaption></figure>
+<h3>Joining sales and ratings</h3><p>With no shared key, the match has to be rebuilt from what both sides record. I normalised addresses on both sides (no accents or punctuation, abbreviations expanded) and kept a pair only if all of these held:</p><ul><li>same commune, house number, street and property type;</li><li>living area within &plusmn;10%;</li><li>rating dated between 12 months before and 1 month after the sale;</li><li>exactly one candidate on each side, so that one rating matches one sale.</li></ul><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 220" role="img" aria-label="Match funnel: 4,245,617 sales, 2,226,768 with the same address and type, 1,618,320 with surface within 10 percent, 1,052,881 within the date window, 604,773 unique matches.">
+<line class="axis" x1="310" y1="4" x2="310" y2="214"/>
+<text x="300" y="27" text-anchor="end">DVF residential sales</text><rect class="fm" x="310" y="10" width="330" height="24" rx="2"><title>DVF residential sales: 4,245,617</title></rect><text x="648" y="27">4,245,617</text>
+<text x="300" y="69" text-anchor="end">Same address and type</text><rect class="fm" x="310" y="52" width="173.1" height="24" rx="2"><title>Same address and type: 2,226,768</title></rect><text x="491" y="69">2,226,768</text>
+<text x="300" y="111" text-anchor="end">Living area within &plusmn;10%</text><rect class="fm" x="310" y="94" width="125.8" height="24" rx="2"><title>Living area within 10%: 1,618,320</title></rect><text x="444" y="111">1,618,320</text>
+<text x="300" y="153" text-anchor="end">Rating 12 months before to 1 after</text><rect class="fm" x="310" y="136" width="81.8" height="24" rx="2"><title>Date window: 1,052,881</title></rect><text x="400" y="153">1,052,881</text>
+<text x="300" y="195" text-anchor="end" class="h">Unique match both ways</text><rect class="fb" x="310" y="178" width="47" height="24" rx="2"><title>Unique match both ways: 604,773</title></rect><text x="365" y="195" class="h">604,773</text>
+</svg></div><figcaption><b>Figure 2.</b> Match funnel, 2021&ndash;2025 sales. The uniqueness rule costs the most, mostly apartments in the same building with similar flats.</figcaption></figure><p>The result is 604,773 matched sales. An independent dataset built with nearly the same rules reports 610,000 [3]. The two counts agree within 1%, which is the best check available that the join is sound. Matches are rare in 2021, because the new rating only started in July 2021, then stable at 14&ndash;22% of sales per year.</p>
+<h3>Features</h3><p>Location explains most of a price, so the key features describe the local market: the average log price per m&sup2; over the previous 12 months, for the same property type, in three nested areas. Those areas are the cadastral section (roughly a neighbourhood, read from the first 10 characters of the parcel ID), the commune and the d&eacute;partement. Each average uses only sales before the one being estimated, so no information from the answer leaks into the inputs. A section with few past sales is pulled toward its commune average, and a commune toward its d&eacute;partement, so that small samples do not dominate.</p><p>The other features are what an owner knows: property type, living area, rooms, land, outbuildings, location. The rating features are the class, CO&#8322; class, energy use per m&sup2;, construction period and year, heating type and floor. They are empty when a sale has no matched rating. Because ADEME also publishes each rating recalculated under the 1.9 coefficient [2], every class in the training data follows the same rule.</p>
+<h3>Protocol</h3><p>The split is by time, never random: training on sales before July 2024, validation on the second half of 2024, test on all of 2025. Models were compared and features selected on validation only. The chosen setup was then refit on training and validation together, and scored on the test set once.</p>
+<h3>Implementation</h3><p>Python on one laptop, with memory capped at 5 GB: DuckDB for the large joins, Polars for cleaning, LightGBM, XGBoost and scikit-learn for the models, uv for the environment. The two raw sources total about 20 million rows. Spark would have added setup without benefit at this size.</p><p>The memory cap shaped the code. My first attempt pulled the energy ratings in a single query and ran out of memory. The rewrite works in two stages: first copy only the needed columns of each table to local Parquet files, then join them locally in eight hash buckets. It extracts all 15.7 million ratings in under three minutes within 5&nbsp;GB. The sales files needed care too: automatic type detection broke on house numbers such as &ldquo;14A&rdquo;, so every column is read as text and converted explicitly.</p><p>The code is organised as a Python package (data, features, models, monitoring), with structured logs that tag every run and its metrics. The repository documents the architecture, six decision records, a data dictionary, the data lineage and a model card.</p></div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <div class="body"><h3>Choosing a model</h3><p>Five approaches were compared on all sales, without rating features. The baseline does no learning: it predicts the neighbourhood&#8217;s past average.</p><div class="tbl"><table><caption><b>Table 1.</b> Validation results, H2 2024 (386,814 sales). Median error is the median of |estimate &minus; price| / price.</caption><thead><tr><th>Model</th><th class="n">Median error</th><th class="n">Within 20%</th><th class="n">Mean error</th><th class="n">Training time</th></tr></thead><tbody><tr><td>Neighbourhood average (baseline)</td><td class="n">19.9%</td><td class="n">50.2%</td><td class="n">&euro;58,044</td><td class="n">&ndash;</td></tr><tr><td>Ridge regression</td><td class="n">19.6%</td><td class="n">50.9%</td><td class="n">&euro;57,283</td><td class="n">2 s</td></tr><tr><td>Random forest (300k rows)</td><td class="n">18.3%</td><td class="n">53.8%</td><td class="n">&euro;53,985</td><td class="n">12 min</td></tr><tr class="best"><td>LightGBM (1M rows)</td><td class="n">17.5%</td><td class="n">55.9%</td><td class="n">&euro;51,739</td><td class="n">28 s</td></tr><tr><td>XGBoost (1M rows)</td><td class="n">17.6%</td><td class="n">55.7%</td><td class="n">&euro;52,003</td><td class="n">75 s</td></tr></tbody></table></div><p>Gradient-boosted trees win, ahead of a random forest [8], as is usual on tabular data [9]. LightGBM [6] and XGBoost [7] are tied on accuracy, and LightGBM trains in a third of the time, which matters once retraining is automated. A linear model barely beats the baseline: it cannot capture that surface or land are worth different amounts in different places.</p>
+<h3>What the energy rating adds</h3><p>To isolate the rating&#8217;s effect, I trained the same model twice on the same matched sales from 2022 onward, once without the rating features and once with them.</p><div class="tbl"><table><caption><b>Table 2.</b> Same model, same rows (73,344 validation sales with a matched rating).</caption><thead><tr><th>Features</th><th class="n">Median error</th><th class="n">Within 20%</th><th class="n">Mean error</th></tr></thead><tbody><tr><td>Without rating</td><td class="n">14.3%</td><td class="n">65.2%</td><td class="n">&euro;45,075</td></tr><tr class="best"><td>With rating</td><td class="n">12.5%</td><td class="n">71.3%</td><td class="n">&euro;40,224</td></tr></tbody></table></div><p>The rating cuts the median error by 13% (14.3% to 12.5%). Matched sales are easier to estimate than average, even without the rating, because the match itself confirms their address and surface. So these numbers should only be compared with each other, never with Table 1.</p>
+<h3>Which features matter</h3><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 316" role="img" aria-label="Permutation importance, top 10 features. Neighbourhood market price 0.408 dominates; then living area 0.041, land area 0.022, commune market price 0.016, construction period 0.015.">
+<line class="axis" x1="310" y1="4" x2="310" y2="310"/>
+<text x="300" y="23" text-anchor="end">Neighbourhood market price</text><rect class="fm" x="310" y="10" width="330" height="18" rx="2"><title>Neighbourhood market price: 0.408</title></rect><text x="648" y="23">0.408</text>
+<text x="300" y="53" text-anchor="end">Living area</text><rect class="fm" x="310" y="40" width="32.8" height="18" rx="2"><title>Living area: 0.041</title></rect><text x="350" y="53">0.041</text>
+<text x="300" y="83" text-anchor="end">Land area</text><rect class="fm" x="310" y="70" width="18.1" height="18" rx="2"><title>Land area: 0.022</title></rect><text x="336" y="83">0.022</text>
+<text x="300" y="113" text-anchor="end">Commune market price</text><rect class="fm" x="310" y="100" width="12.6" height="18" rx="2"><title>Commune market price: 0.016</title></rect><text x="331" y="113">0.016</text>
+<text x="300" y="143" text-anchor="end">Construction period (rating)</text><rect class="fb" x="310" y="130" width="12.5" height="18" rx="2"><title>Construction period: 0.015</title></rect><text x="331" y="143">0.015</text>
+<text x="300" y="173" text-anchor="end">D&eacute;partement</text><rect class="fm" x="310" y="160" width="10.1" height="18" rx="2"><title>Departement: 0.013</title></rect><text x="328" y="173">0.013</text>
+<text x="300" y="203" text-anchor="end">Commune sales volume</text><rect class="fm" x="310" y="190" width="6" height="18" rx="2"><title>Commune sales volume: 0.007</title></rect><text x="324" y="203">0.007</text>
+<text x="300" y="233" text-anchor="end">Energy class (rating)</text><rect class="fb" x="310" y="220" width="4.4" height="18" rx="2"><title>Energy class: 0.0055</title></rect><text x="322" y="233">0.006</text>
+<text x="300" y="263" text-anchor="end">Energy use per m&sup2; (rating)</text><rect class="fb" x="310" y="250" width="4.2" height="18" rx="2"><title>Energy use per m2: 0.0052</title></rect><text x="322" y="263">0.005</text>
+<text x="300" y="293" text-anchor="end">D&eacute;partement market price</text><rect class="fm" x="310" y="280" width="3.9" height="18" rx="2"><title>Departement market price: 0.0048</title></rect><text x="322" y="293">0.005</text>
+</svg></div><figcaption><b>Figure 3.</b> Permutation importance on validation, top 10 of 24 features. Each bar is how much the error grows when that feature is shuffled. Features from the energy rating are in blue.</figcaption></figure><p>The neighbourhood&#8217;s past prices dominate. Among the rating features, the construction period matters more than the energy class itself: a building&#8217;s age carries its structure, style and typical condition. Three features scored zero or within noise and were dropped, including the time index. Trees cannot extrapolate: every validation date lies after every training date, so the model treats them all as the latest month. The market trend is already carried by the rolling 12-month prices.</p>
+<h3>Final test on 2025</h3><p>The final model is trained on all sales, with the rating features empty when there is no match, so one model serves owners who know their rating and those who don&#8217;t. Early stopping picked 2,646 trees, and the model was refit on 3.45 million sales (2021&ndash;2024).</p><div class="tbl"><table><caption><b>Table 3.</b> Test results on 2025 (790,767 sales, scored once).</caption><thead><tr><th>Segment</th><th class="n">Median error</th><th class="n">Within 10%</th><th class="n">Within 20%</th><th class="n">Mean error</th></tr></thead><tbody><tr class="best"><td>All sales</td><td class="n">16.0%</td><td class="n">33.2%</td><td class="n">59.5%</td><td class="n">&euro;48,945</td></tr><tr><td>Apartments</td><td class="n">13.6%</td><td class="n">38.1%</td><td class="n">66.9%</td><td class="n">&euro;38,973</td></tr><tr><td>Houses</td><td class="n">18.2%</td><td class="n">29.4%</td><td class="n">53.8%</td><td class="n">&euro;56,675</td></tr><tr><td>With a matched rating</td><td class="n">11.9%</td><td class="n">43.1%</td><td class="n">72.6%</td><td class="n">&euro;39,805</td></tr><tr><td>Without a matched rating</td><td class="n">17.2%</td><td class="n">30.9%</td><td class="n">56.4%</td><td class="n">&euro;51,129</td></tr></tbody></table></div><p>The test score (16.0%) is as good as validation (16.3%), so the model holds up on a year it never saw. Apartments are easier than houses, which vary in ways the data does not record: land quality, condition, extensions.</p></div>
+  </section>
+
+  <section id="takeaway">
+    <h2>Takeaway</h2>
+    <div class="body"><p>The join was the project. The model was quick to train. The time went into rebuilding a link the two datasets never had, and into checking it against an independent count. Once it held, the energy rating&#8217;s value could be measured on identical sales, instead of being guessed from averages.</p>
+<h3>Limitations</h3><ul><li>Sales records hold no condition, floor for houses, view or renovation, so part of every price is out of reach.</li><li>Alsace, Moselle and Mayotte are not in the sales data.</li><li>Only 14% of sales have a matched rating. Matched sales are cleaner than average, so the &ldquo;with rating&rdquo; score is partly selection.</li><li>The rating&#8217;s effect is an association learned from local sales, not a guaranteed gain from renovating.</li><li>Ratings issued from 2027 use a new coefficient [5]. Until the model is retrained, new labels will not mean what the training labels meant.</li></ul>
+<h3>Next: part 2</h3><p>That last limitation is the reason for part 2. It covers automating the whole pipeline, detecting the January 2027 rating change in incoming data, triggering a retrain, and serving the model through an API and a public app. Part 2 is in progress.</p></div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <div class="body"><ol class="refs">
+<li>DGFiP and Etalab. Demandes de valeurs fonci&egrave;res g&eacute;olocalis&eacute;es (DVF). data.gouv.fr, Licence Ouverte.</li>
+<li>ADEME. DPE Logements existants (depuis juillet 2021). data.gouv.fr and data.ademe.fr, Licence Ouverte.</li>
+<li>France DPE. Valeur verte des logements : &eacute;carts de prix par &eacute;tiquette DPE (610 000 ventes DVF x ADEME). data.gouv.fr.</li>
+<li>Minist&egrave;re de l&#8217;&Eacute;conomie, 2025. Un nouveau DPE au 1er janvier 2026 pour favoriser le chauffage &eacute;lectrique. economie.gouv.fr.</li>
+<li>Minist&egrave;re de la Transition &eacute;cologique, 2026. DPE et audits &eacute;nerg&eacute;tiques : publication de l&#8217;arr&ecirc;t&eacute; abaissant le facteur de conversion de l&#8217;&eacute;lectricit&eacute; &agrave; 1,7 au 1er janvier 2027. ecologie.gouv.fr.</li>
+<li>Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q. and Liu, T.-Y., 2017. LightGBM: a highly efficient gradient boosting decision tree. <i>Advances in Neural Information Processing Systems</i>, 30.</li>
+<li>Chen, T. and Guestrin, C., 2016. XGBoost: a scalable tree boosting system. <i>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</i>, 785&ndash;794.</li>
+<li>Breiman, L., 2001. Random forests. <i>Machine Learning</i>, 45(1), 5&ndash;32.</li>
+<li>Grinsztajn, L., Oyallon, E. and Varoquaux, G., 2022. Why do tree-based models still outperform deep learning on typical tabular data? <i>Advances in Neural Information Processing Systems</i>, 35, Datasets and Benchmarks Track.</li></ol></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a href="../#work">&larr; Back to work</a>
+  <p>Personal project on French public open data. Code: <a href="https://github.com/rdmouhouadi/property-price-estimator#readme">github.com/rdmouhouadi/property-price-estimator</a></p>
+</footer>
+</div>
+<script data-goatcounter="https://rdmouhouadi.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
