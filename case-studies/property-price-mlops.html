@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catching a rule change before it breaks the model | Richie Mouhouadi</title>
+<meta name="description" content="Part 2 of a French property price estimator: a reproducible pipeline, an API and app, and a drift detector that catches the 2027 energy-rating rule change that label-distribution tests miss, then retrains automatically.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23131a16'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='44' font-style='italic' text-anchor='middle' fill='%23ebeee8'%3ER%3C/text%3E%3Ccircle cx='51' cy='13' r='5' fill='%232438d8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--paper:#ebeee8;--ink:#131a16;--muted:#586259;--rule:#c3cabf;--dash:#a1a99d;--blue:#2438d8;--todo:rgba(36,56,216,.1);
+  --display:"Instrument Serif","Times New Roman",Georgia,serif;--sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}}
+:root[data-theme="dark"]{--paper:#0f1513;--ink:#e9ece4;--muted:#9aa49a;--rule:#2a3631;--dash:#4b5953;--blue:#8c98ff;--todo:rgba(140,152,255,.18)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--blue);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:15px}
+.bar a{text-decoration:none}
+@media (hover:hover){.bar a:hover,.foot a:hover{color:var(--blue)}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,84px);line-height:1;letter-spacing:-.02em;margin:56px 0 20px;max-width:16ch;text-wrap:balance}
+.meta{color:var(--muted);margin:0 0 32px}
+.meta:has(+.journey){margin-bottom:10px}
+.journey{color:var(--muted);margin:0 0 32px;font-size:15px}
+.journey b{color:var(--ink);font-weight:600}
+.journey i{font-style:normal}
+@media (max-width:760px){.journey span{display:block;margin-bottom:2px}.journey i{display:none}}
+.lede{font-size:clamp(20px,2.4vw,24px);line-height:1.5;max-width:34em;margin:0 0 64px}
+section{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding:48px 0;border-top:1px solid var(--rule)}
+section h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.1;margin:0}
+.body p,.body li{font-size:20px;line-height:1.65;max-width:36em;text-wrap:pretty}
+.body p{margin:0 0 18px}
+.body ul{margin:0 0 18px;padding-left:22px}
+.body li{margin-bottom:8px}
+.body h3{font-family:var(--display);font-weight:400;font-size:26px;margin:32px 0 10px}
+.body h3:first-child{margin-top:0}
+.body a,.refs li{overflow-wrap:anywhere}
+.todo{background:var(--todo);border-radius:3px;padding:0 4px}
+.foot{border-top:1px solid var(--ink);margin-top:16px;padding:36px 0 64px;display:flex;justify-content:space-between;gap:16px 32px;flex-wrap:wrap;font-size:15px}
+.foot p{margin:0;color:var(--muted);max-width:34em}
+.foot a{font-weight:500}
+@media (max-width:760px){section{grid-template-columns:minmax(0,1fr);gap:16px;padding:36px 0}.body p,.body li{font-size:18px}}
+
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid var(--ink);padding-top:20px;margin:0 0 36px}
+.brief dt{font-size:14px;color:var(--muted)}
+.brief dd{margin:4px 0 0;font-family:var(--display);font-size:24px;line-height:1.15}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;margin:0 0 56px}
+.toc a{text-decoration:none}
+@media (hover:hover){.toc a:hover{color:var(--blue)}}
+.fig{margin:32px 0}
+.fig .frame{background:#fff;border:1px solid var(--rule);border-radius:4px;padding:12px;max-width:760px}
+.fig img{display:block;max-width:100%;height:auto;margin:0 auto}
+.fig.dgfig .frame{background:transparent}
+figcaption{margin-top:10px;font-size:15px;line-height:1.5;color:var(--muted);max-width:44em}
+figcaption b{color:var(--ink);font-weight:600}
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.dg .m{fill:var(--muted);font-size:12px}
+.dg .h{font-weight:600;font-size:14px}
+.dg .b{fill:none;stroke:var(--ink);stroke-width:1.4}
+.dg .g{fill:none;stroke:var(--blue);stroke-width:1.8}
+.dg .a{fill:none;stroke:var(--muted);stroke-width:1.4}
+.dg .dash{stroke-dasharray:5 4}
+.dg .mk{fill:var(--muted)}
+.dg .fb{fill:var(--blue)}
+.dg .fm{fill:var(--dash)}
+.dg .axis{stroke:var(--rule);stroke-width:1}
+.tbl{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;font-size:16px;width:100%;min-width:520px}
+caption{text-align:left;font-size:15px;color:var(--muted);padding-bottom:8px}
+caption b{color:var(--ink);font-weight:600}
+th,td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:14px;font-weight:600;color:var(--muted)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.best td{font-weight:600}
+.eq{font-family:var(--display);font-style:italic;font-size:24px;margin:20px 0 4px;overflow-x:auto}
+.eqn{font-size:15px!important;color:var(--muted)}
+.refs{padding-left:24px}
+.refs li{font-size:16px;line-height:1.55}
+@media (max-width:760px){.brief{grid-template-columns:1fr 1fr}}
+.shot{background:var(--todo);border-radius:4px;padding:40px 16px;text-align:center;color:var(--muted);font-size:15px;max-width:760px}
+/* consistent link hover */
+@media (hover:hover){a:hover{color:var(--blue)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="bar">
+  <a href="../"><strong>Richie</strong></a>
+  <a href="../#work">&larr; Back to work</a>
+</header>
+
+<main>
+  <h1>Catching a rule change before it breaks the model</h1>
+  <p class="meta">Personal project &middot; Open data &middot; 2026 &middot; Part 2 of 2: MLOps and serving &middot; <a href="property-price-dpe.html">Part 1: the model</a></p>
+  <p class="journey"><span><b>New to me:</b> DVC and MLflow in practice, after a course on the theory</span><i aria-hidden="true"> &middot; </i><span><b>First estimate served:</b> same afternoon</span><i aria-hidden="true"> &middot; </i><span><b>Whole build:</b> one weekend, model on day 1, MLOps on day 2</span></p>
+  <p class="lede">France changes how the energy rating is calculated on 1 January 2027, and the price model from part 1 would quietly go stale. I turned it into a pipeline that can rebuild itself, served it through an API and an app, and built a monitor for that change. The standard test on label distributions missed a simulated version of it. A detector that watches the rule itself caught it on the first new ratings, and triggered a retrain on its own.</p>
+  <dl class="brief">
+    <div><dt>Pipeline</dt><dd>DVC + MLflow, one command</dd></div>
+    <div><dt>Serving</dt><dd>FastAPI + Streamlit</dd></div>
+    <div><dt>Monitor</dt><dd>Implied coefficient + PSI</dd></div>
+    <div><dt>Outcome</dt><dd>Change caught, &minus;10.8% vs &plusmn;3% alert</dd></div>
+  </dl>
+  <nav class="toc" aria-label="On this page"><a href="#context">Context</a><a href="#problem">Problem</a><a href="#method">Methodology</a><a href="#results">Results</a><a href="#takeaway">Takeaway</a><a href="#refs">References</a></nav>
+
+  <section id="context">
+    <h2>Context</h2>
+    <div class="body"><p>In <a href="property-price-dpe.html">part 1</a>, I joined 4.2 million French property sales with 15.7 million energy ratings (DPE) and trained a model that estimates a sale price. On 2025 sales, half of its estimates fall within 16% of the real price.</p><p>The energy label is one of its inputs, and the label&#8217;s rules keep moving. For homes heated by electricity, the calculation converts final energy into primary energy with a coefficient. It went from 2.3 to 1.9 on 1 January 2026 [1], and drops to 1.7 on 1 January 2027 [2]. A home can move up a label with no work done. The model was trained on labels computed at 1.9. From 2027, users will enter labels computed at 1.7.</p><p>Part 1 was a set of scripts run by hand, in an order only I knew. That doesn&#8217;t survive a rule change.</p></div>
+  </section>
+
+  <section id="problem">
+    <h2>Problem</h2>
+    <div class="body"><p>I wanted the estimator to be usable by anyone, and to notice the 2027 change by itself. That needs four things: a pipeline that can rebuild the model from raw data, a record of which model is in use, a way for people to get an estimate from an address, and a monitor that raises an alert when the rule changes.</p><p><b>Question:</b> can a monitor detect a change in the rating rules from incoming ratings alone, early enough to retrain before the old model gives wrong answers?</p></div>
+  </section>
+
+  <section id="method">
+    <h2>Methodology</h2>
+    <div class="body"><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 226" role="img" aria-label="Loop: new ratings go to the drift check; on drift, the trigger writes the new coefficient into params.yaml; DVC reruns features, training and test; the promotion gate decides whether the new model becomes the champion in MLflow; FastAPI serves the champion to the Streamlit app.">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="b" x="2" y="10" width="120" height="66" rx="6"/><text x="62" y="39" text-anchor="middle">New ratings</text><text x="62" y="57" text-anchor="middle" class="m">ADEME, daily</text>
+<rect class="g" x="162" y="10" width="120" height="66" rx="6"/><text x="222" y="39" text-anchor="middle">Drift check</text><text x="222" y="57" text-anchor="middle" class="m">rule + labels</text>
+<rect class="b" x="314" y="10" width="120" height="66" rx="6"/><text x="374" y="39" text-anchor="middle">Trigger</text><text x="374" y="57" text-anchor="middle" class="m">params.yaml &larr; 1.7</text>
+<rect class="b" x="466" y="10" width="120" height="66" rx="6"/><text x="526" y="39" text-anchor="middle">dvc repro</text><text x="526" y="57" text-anchor="middle" class="m">features&rarr;train&rarr;test</text>
+<rect class="g" x="618" y="10" width="100" height="66" rx="6"/><text x="668" y="39" text-anchor="middle">Gate</text><text x="668" y="57" text-anchor="middle" class="m">beats champion?</text>
+<line class="a" x1="122" y1="43" x2="160" y2="43" marker-end="url(#ah)"/><line class="a" x1="282" y1="43" x2="312" y2="43" marker-end="url(#ah)"/><line class="a" x1="434" y1="43" x2="464" y2="43" marker-end="url(#ah)"/><line class="a" x1="586" y1="43" x2="616" y2="43" marker-end="url(#ah)"/>
+<line class="a" x1="668" y1="76" x2="668" y2="136" marker-end="url(#ah)"/>
+<rect class="b" x="618" y="138" width="100" height="66" rx="6"/><text x="668" y="167" text-anchor="middle">MLflow</text><text x="668" y="185" text-anchor="middle" class="m">&ldquo;champion&rdquo;</text>
+<rect class="b" x="466" y="138" width="120" height="66" rx="6"/><text x="526" y="167" text-anchor="middle">FastAPI</text><text x="526" y="185" text-anchor="middle" class="m">/estimate</text>
+<rect class="b" x="314" y="138" width="120" height="66" rx="6"/><text x="374" y="167" text-anchor="middle">Streamlit app</text><text x="374" y="185" text-anchor="middle" class="m">address &rarr; price</text>
+<line class="a" x1="618" y1="171" x2="588" y2="171" marker-end="url(#ah)"/><line class="a" x1="466" y1="171" x2="436" y2="171" marker-end="url(#ah)"/>
+<rect class="b dash" x="2" y="138" width="280" height="66" rx="6"/><text x="142" y="167" text-anchor="middle">CI on every push</text><text x="142" y="185" text-anchor="middle" class="m">lockfile &middot; lint &middot; tests &middot; pipeline check</text>
+</svg></div><figcaption><b>Figure 1.</b> The loop built in part 2. Blue boxes make the decisions: the drift check decides whether to retrain, the gate decides whether to promote.</figcaption></figure>
+<h3>A pipeline that can rebuild itself</h3><p>DVC [3] wraps the existing scripts as stages: download, extract, clean, join, features, train, test. Each stage declares its code, its input files and the settings it reads. Every setting lives in one file, <code>params.yaml</code>, including the electricity coefficient. Change one value and <code>dvc repro</code> reruns exactly the stages that depend on it, and nothing else. Outputs that already existed were registered without being recomputed.</p><p>MLflow [4] records every training run: settings, validation and test scores, and the model file. Each run registers a new model version, and an alias, <i>champion</i>, marks the one in use. A new version becomes champion only if its test error beats the current champion&#8217;s. The roles are separate: DVC knows <i>how</i> a model is produced, MLflow knows <i>what</i> each run gave and which one is live.</p><figure class="fig"><div class="frame"><img src="images/ppe-mlflow-registry.jpg" width="1251" height="388" alt="MLflow model registry: property-price-estimator, version 1, with the champion alias." loading="lazy"></div><figcaption><b>Figure 2.</b> The model registry in MLflow. The <i>champion</i> alias marks the version the API serves.</figcaption></figure>
+<h3>From an address to an estimate</h3><p>The model needs 21 features. A user knows an address, a surface and a few details. FastAPI [5] fills the gap. IGN&#8217;s geocoding service turns the address into a commune and coordinates [6]. The cadastre service gives the parcel, whose ID contains the cadastral section [7]. A table rebuilt by the pipeline gives the latest local prices, with the same smoothing as in training. The API returns the estimate, a typical range (plus or minus the test median error for that property type) and the price the same home would fetch with each label from A to G. The Streamlit app is only a client of that API. In line with the sales data&#8217;s terms, it shows no individual sale and asks search engines not to index it.</p><figure class="fig"><div class="frame"><img src="images/ppe-fastapi-docs.jpg" width="778" height="838" alt="FastAPI interactive docs: a POST request to /estimate for 10 rue de Rivoli, Paris, a 50 square-metre apartment rated D, and the JSON response with the price, typical range, location, model version and a price for each label." loading="lazy"></div><figcaption><b>Figure 3.</b> The API&#8217;s interactive docs. One request with an address returns the estimate, the range, the resolved location and a price for each label.</figcaption></figure>
+<h3>A monitor, tested before being trusted</h3><p>The usual check compares the distribution of a variable today with a reference, here with the Population Stability Index (PSI) [8]. Before relying on it, I tested it against the change it was meant to catch. I took the ratings issued in the last six months and recalculated the electric-heated ones at 1.7 with the 2021 label thresholds. Then I ran two kinds of checks. <b>Real</b> checks run on actual recent ratings and must stay stable: that shows the training labels are consistent. <b>Simulated</b> checks run on the recalculated ratings and must fire: that shows the monitor can see the change.</p><p>A second detector watches the rule itself. For homes heated by electricity, primary energy is final energy times the coefficient, so the median ratio between the two, over recent ratings, gives the coefficient in use. I call it the <i>implied coefficient</i>. Today it should read 1.9. An alert fires if it moves by more than 3%.</p>
+<h3>From alert to retrained model</h3><p>The label thresholds and the recalculation live in one module, shared by the features and the monitor, so both apply the same rule. When the implied coefficient drifts, a trigger script writes the new value into <code>params.yaml</code> and runs the pipeline: labels are recalculated, the model is retrained and tested, and the gate decides. Nothing is committed automatically. A person reviews the change to <code>params.yaml</code> and the pipeline lock file, and commits.</p>
+<h3>Checks on every push</h3><p>GitHub Actions installs the exact locked environment, lints the code (ruff), runs the tests (pytest) and checks that the pipeline definition is valid. CI has no data and no model, so the label rules are tested on a tiny in-memory table: an electric home at 190 kWh/m&sup2; becomes 170 at the new coefficient, and moves from D to C. The API test mocks the geocoder and is skipped when no model is present.</p><figure class="fig"><div class="frame"><img src="images/ppe-ci-runs.jpg" width="920" height="218" alt="GitHub Actions: the first CI run failed, the second, after a fix to the workflow file, passed in 29 seconds." loading="lazy"></div><figcaption><b>Figure 4.</b> CI on GitHub Actions. The first run failed on the workflow file itself; the fix passed in 29 seconds.</figcaption></figure></div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <div class="body"><h3>The standard monitor was blind</h3><div class="tbl"><table><caption><b>Table 1.</b> Drift checks. Reference: harmonised ratings from the 12 months before 2025. Recent: ratings issued in the last 6 months. Simulated: the same ratings recalculated at 1.7.</caption><thead><tr><th>Detector</th><th class="n">Real recent</th><th class="n">Simulated 1.7</th><th class="n">Alert at</th><th>Sees it?</th></tr></thead><tbody><tr><td>Label PSI, all ratings</td><td class="n">0.017</td><td class="n">0.028</td><td class="n">0.1</td><td>No</td></tr><tr><td>Label PSI, electric-heated only</td><td class="n">0.006</td><td class="n">0.033</td><td class="n">0.1</td><td>No</td></tr><tr class="best"><td>Implied coefficient</td><td class="n">1.900</td><td class="n">1.70</td><td class="n">&plusmn;3%</td><td>Yes</td></tr></tbody></table></div><figure class="fig dgfig"><div class="frame"><svg class="dg" viewBox="0 0 720 150" role="img" aria-label="Signal as a share of its alert threshold on the simulated 2027 change: label PSI all ratings 28 percent, label PSI electric homes 33 percent, implied coefficient 358 percent. Only the implied coefficient crosses the alert line.">
+<line class="axis" x1="310" y1="4" x2="310" y2="124"/>
+<line class="g dash" x1="392.5" y1="4" x2="392.5" y2="124"/><text x="392.5" y="142" text-anchor="middle" class="m">alert threshold</text>
+<text x="300" y="27" text-anchor="end">Label PSI, all ratings</text><rect class="fm" x="310" y="12" width="23.1" height="22" rx="2"><title>Label PSI, all ratings: 0.028, 28% of the 0.1 threshold</title></rect><text x="341" y="28">28%</text>
+<text x="300" y="67" text-anchor="end">Label PSI, electric homes</text><rect class="fm" x="310" y="52" width="27.2" height="22" rx="2"><title>Label PSI, electric homes: 0.033, 33% of the 0.1 threshold</title></rect><text x="345" y="68">33%</text>
+<text x="300" y="107" text-anchor="end" class="h">Implied coefficient</text><rect class="fb" x="310" y="92" width="295.4" height="22" rx="2"><title>Implied coefficient: -10.75%, 358% of the 3% threshold</title></rect><text x="613" y="108" class="h">358%</text>
+</svg></div><figcaption><b>Figure 5.</b> Each detector&#8217;s signal on the simulated 2027 change, as a share of its own alert threshold. Only the detector that watches the rule crosses its line.</figcaption></figure><p>The real checks stayed stable, so the training labels follow one rule. But the label PSI stayed far below its alert level on the simulated change, even when restricted to electric-heated homes, where A-rated homes went from 4.1% to 6.3% and B-rated from 8.8% to 12.8%. The change is diluted twice: most homes don&#8217;t heat with electricity, and among those that do, only homes near a threshold change label. The implied coefficient moved from 1.905 to 1.70, a 10.75% drop against a 3% alert level. It reacts to the first ratings issued under a new rule, before any distribution moves.</p>
+<figure class="fig"><div class="frame"><img src="images/ppe-drift-electric.jpg" width="1239" height="867" alt="Bar chart of energy labels A to G for electric-heated homes: reference, recent real and simulated at coefficient 1.7. The simulated bars shift towards A and B; PSI 0.0329, stable." loading="lazy"></div><figcaption><b>Figure 6.</b> The drift report for electric-heated homes. The shift towards A and B is visible to the eye, but stays below the PSI alert level.</figcaption></figure>
+<h3>The loop ran by itself, and exposed a weak gate</h3><p>Run in simulation mode, the trigger read the alert, wrote 1.7 into <code>params.yaml</code> and started the pipeline. Labels were recalculated, the model retrained (2,966 trees) and tested, and version 2 was registered.</p><div class="tbl"><table><caption><b>Table 2.</b> Test on 2025, before and after the simulated retrain.</caption><thead><tr><th>Model</th><th class="n">Labels at</th><th class="n">Median error</th><th class="n">Within 20%</th><th>Gate</th></tr></thead><tbody><tr><td>v1 (champion)</td><td class="n">1.9</td><td class="n">15.96%</td><td class="n">59.5%</td><td>&ndash;</td></tr><tr><td>v2 (challenger)</td><td class="n">1.7</td><td class="n">15.94%</td><td class="n">59.6%</td><td>promoted</td></tr></tbody></table></div><p>The gate promoted v2, but for a bad reason. A difference of 0.02 points is noise. Worse, the two scores were measured on different inputs: v2 on labels at 1.7, v1 on labels at 1.9. A fair gate scores both models on the same current data and requires a margin. After a rule change, &ldquo;not worse&rdquo; should be enough, because the old model no longer matches the labels users enter. I reverted the demo and put the fix on the roadmap.</p>
+<h3>What the app shows</h3><figure class="fig"><div class="frame"><img src="images/ppe-app-lepecq.jpg" width="1243" height="843" alt="Streamlit app: a 50 square-metre apartment in Le Pecq estimated at 206,000 euros, typical range 178,000 to 234,000, a map, and a bar chart of the estimated price for each energy label from A to G." loading="lazy"></div><figcaption><b>Figure 7.</b> The app: estimate, typical range, map, and the same home&#8217;s price with each label.</figcaption></figure><div class="tbl"><table><caption><b>Table 3.</b> Same 50 m&sup2;, 2-room apartment rated D, at two real addresses.</caption><thead><tr><th>Address</th><th class="n">Estimate</th><th class="n">Per m&sup2;</th><th class="n">Label G &rarr; A</th></tr></thead><tbody><tr><td>Rue de Rivoli, Paris 4e</td><td class="n">&euro;587,000</td><td class="n">&euro;11,750</td><td class="n">+4%</td></tr><tr><td>Le Pecq, Yvelines</td><td class="n">&euro;206,000</td><td class="n">&euro;4,127</td><td class="n">+13%</td></tr></tbody></table></div><p>The label is worth three times more, in relative terms, outside central Paris. Where location sets most of the price, the label barely moves it. This is an association learned from local sales, not a promise about renovating.</p></div>
+  </section>
+
+  <section id="takeaway">
+    <h2>Takeaway</h2>
+    <div class="body"><p>The interesting part of the MLOps work wasn&#8217;t the tools. It was finding out that the monitor I would have shipped by default couldn&#8217;t see the one change it was built for. Two lessons I&#8217;ll reuse: <b>test every monitor against a simulated version of the drift before trusting it</b>, and <b>when you know what can change, watch the cause, not only its effects</b>.</p>
+<h3>Limitations</h3><ul><li>On simulated data, the implied coefficient moves partly by construction. The honest test is the real change of January 2026, from 2.3 to 1.9: the monthly implied coefficient should step down from about 2.3 to about 1.9. That backtest hasn&#8217;t been run yet; it is first on the list below.</li><li>The recalculation is approximate: 2021 thresholds, no small-surface rule, and homes with several energy sources scaled on their total.</li><li>The promotion gate compares scores from different inputs, with no margin (see above).</li><li>The range shown is a typical error, not a calibrated interval: about half of real prices fall outside it.</li><li>Serving depends on two IGN services. When they are down, the API returns an error rather than a guess.</li><li>The drift check runs on demand. It isn&#8217;t scheduled yet.</li></ul>
+<h3>Next</h3><p>The real-event backtest, a fairer gate, a weekly schedule, then Docker and infrastructure as code. Further out: a value-over-time view, with 10-year curves under explicit scenarios (local development from building permits and zoning, market downturn, energy-label rental bans, renovation).</p></div>
+  </section>
+
+  <section id="refs">
+    <h2>References</h2>
+    <div class="body"><ol class="refs">
+<li>Minist&egrave;re de l&#8217;&Eacute;conomie, 2025. Un nouveau DPE au 1er janvier 2026 pour favoriser le chauffage &eacute;lectrique. economie.gouv.fr.</li>
+<li>Minist&egrave;re de la Transition &eacute;cologique, 2026. DPE et audits &eacute;nerg&eacute;tiques : publication de l&#8217;arr&ecirc;t&eacute; abaissant le facteur de conversion de l&#8217;&eacute;lectricit&eacute; &agrave; 1,7 au 1er janvier 2027. ecologie.gouv.fr.</li>
+<li>DVC documentation: data pipelines and parameters. dvc.org/doc.</li>
+<li>MLflow documentation: tracking and model registry. mlflow.org/docs.</li>
+<li>FastAPI documentation. fastapi.tiangolo.com.</li>
+<li>IGN. G&eacute;oplateforme geocoding service. geoservices.ign.fr.</li>
+<li>IGN. API Carto, cadastre module. apicarto.ign.fr.</li>
+<li>Siddiqi, N., 2006. <i>Credit Risk Scorecards: Developing and Implementing Intelligent Credit Scoring</i>. Wiley.</li>
+<li>Huyen, C., 2022. <i>Designing Machine Learning Systems</i>. O&#8217;Reilly, chapter 8: data distribution shifts and monitoring.</li>
+<li>Rabanser, S., G&uuml;nnemann, S. and Lipton, Z., 2019. Failing loudly: an empirical study of methods for detecting dataset shift. <i>Advances in Neural Information Processing Systems</i>, 32.</li></ol></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a href="../#work">&larr; Back to work</a>
+  <p>Personal project on French public open data. Part 1: <a href="property-price-dpe.html">the model</a>. Code: <a href="https://github.com/rdmouhouadi/property-price-estimator">github.com/rdmouhouadi/property-price-estimator</a></p>
+</footer>
+</div>
+<script data-goatcounter="https://rdmouhouadi.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
