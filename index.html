@@ -215,7 +215,6 @@ p,li{text-wrap:pretty}
 .mp-card p{margin:0 0 12px;color:var(--muted);font-size:16.5px;line-height:1.5}
 .mp-card .stack{color:var(--ink);font-weight:500;font-size:15px;margin-top:auto;padding-top:4px}
 .mp-links{margin-top:14px;display:flex;gap:22px;flex-wrap:wrap;font-weight:500}
-.mp-soon{color:var(--muted)}
 @media (max-width:760px){.mp-card{flex:0 0 82%;min-width:0;max-width:none}.mp-arrow{display:none}.more-projects{margin-top:72px}}
 @media print{
   :root,:root[data-theme="dark"]{--paper:#fff;--ink:#000;--muted:#444;--rule:#ccc;--blue:#000;--band:#fff;--band-text:#000;--tile:#eee;--ghost:transparent;--dash:#999}
@@ -382,9 +381,9 @@ p,li{text-wrap:pretty}
       <article class="mp-card">
         <p class="mp-tag">MLOps &middot; Price estimator, part 2</p>
         <h4>Catching a rule change before it breaks the model</h4>
-        <p>The price model, turned into a pipeline that rebuilds itself, an API and an app. Its drift monitor caught a simulated 2027 energy-rating rule change that the standard test missed, then retrained the model on its own.</p>
-        <p class="stack">DVC, MLflow, FastAPI, Streamlit, GitHub Actions</p>
-        <div class="mp-links"><span class="mp-soon">Try it: coming soon</span><a href="case-studies/property-price-mlops.html">Case study</a><a href="https://github.com/rdmouhouadi/property-price-estimator#readme">Code and README</a></div>
+        <p>The price model, turned into a pipeline that rebuilds itself, an API and an app. Its drift monitor caught a simulated 2027 energy-rating rule change that the standard test missed, then retrained the model on its own. The app is live, and the model is published on Hugging Face.</p>
+        <p class="stack">DVC, MLflow, FastAPI, Streamlit, GitHub Actions, Hugging Face</p>
+        <div class="mp-links"><a href="https://property-price-estimator.streamlit.app">Try it</a><a href="case-studies/property-price-mlops.html">Case study</a><a href="https://github.com/rdmouhouadi/property-price-estimator#readme">Code and README</a><a href="https://huggingface.co/rdmouhouadi/property-price-estimator">Model</a></div>
       </article>
       <article class="mp-card">
         <p class="mp-tag">Product &middot; Live beta</p>
